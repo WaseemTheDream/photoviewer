@@ -1,5 +1,6 @@
 package com.example.android.photoviewer.data.remote
 
+import com.example.android.photoviewer.core.app.Constants
 import retrofit2.Response
 
 interface PhotoRemoteDataSource {
@@ -7,6 +8,6 @@ interface PhotoRemoteDataSource {
     suspend fun getPhotos(
         apiKey: String,
         pageNumber: Int,
-        perPage: Int = 20
+        perPage: Int = Constants.MAX_PAGE_SIZE
     ): Response<PhotoResponse>
 }

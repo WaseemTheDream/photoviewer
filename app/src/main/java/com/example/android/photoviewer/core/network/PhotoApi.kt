@@ -1,5 +1,6 @@
 package com.example.android.photoviewer.core.network
 
+import com.example.android.photoviewer.core.app.Constants
 import com.example.android.photoviewer.data.remote.PhotoResponse
 import retrofit2.Response
 import retrofit2.http.GET
@@ -16,6 +17,6 @@ interface PhotoApi {
     suspend fun getPhotos(
         @Query("Authorization") token: String,
         @Query("page") pageNumber: Int,
-        @Query("per_page") perPage: Int = 20,
+        @Query("per_page") perPage: Int = Constants.MAX_PAGE_SIZE,
     ): Response<PhotoResponse>
 }
