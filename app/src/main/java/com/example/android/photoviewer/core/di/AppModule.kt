@@ -3,6 +3,8 @@ package com.example.android.photoviewer.core.di
 import com.example.android.photoviewer.core.network.PhotoApi
 import com.example.android.photoviewer.data.remote.PhotoRemoteDataSource
 import com.example.android.photoviewer.data.remote.PhotoRemoteDataSourceImpl
+import com.example.android.photoviewer.data.repository.PhotoRepository
+import com.example.android.photoviewer.data.repository.PhotoRepositoryImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -18,4 +20,12 @@ object AppModule {
     fun providePhotoRemoteDataSource(
         remoteApi: PhotoApi
     ): PhotoRemoteDataSource = PhotoRemoteDataSourceImpl(remoteApi)
+
+    @Singleton
+    @Provides
+    fun providePhotoRepository(
+        photoRemoteDataSource: PhotoRemoteDataSource
+    ): PhotoRepository {
+        return PhotoRepositoryImpl(photoRemoteDataSource)
+    }
 }

@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.android.photoviewer.data.remote.PhotoRemoteDataSource
+import com.example.android.photoviewer.ui.photoslist.PhotosListScreen
 import com.example.android.photoviewer.ui.theme.PhotoViewerTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
@@ -23,16 +24,8 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
-    private val TAG = MainActivity::class.java.simpleName
-
-    @Inject
-    lateinit var photoDataSource: PhotoRemoteDataSource
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        MainScope().launch { fetchPhotos() }
-
         setContent {
             PhotoViewerTheme {
                 // A surface container using the 'background' color from the theme
@@ -40,31 +33,9 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    Greeting("Android")
+                    PhotosListScreen()
                 }
             }
         }
-    }
-
-    private suspend fun fetchPhotos() {
-        val response = photoDataSource.getPhotos("123", 1)
-        Log.d(TAG, response.code().toString())
-    }
-}
-
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    PhotoViewerTheme {
-        Greeting("Android")
     }
 }

@@ -4,6 +4,7 @@ import com.example.android.photoviewer.core.app.Constants
 import com.example.android.photoviewer.data.remote.PhotoResponse
 import retrofit2.Response
 import retrofit2.http.GET
+import retrofit2.http.Header
 import retrofit2.http.Query
 
 interface PhotoApi {
@@ -15,7 +16,7 @@ interface PhotoApi {
 
     @GET(API_URL)
     suspend fun getPhotos(
-        @Query("Authorization") token: String,
+        @Header("Authorization") token: String,
         @Query("page") pageNumber: Int,
         @Query("per_page") perPage: Int = Constants.MAX_PAGE_SIZE,
     ): Response<PhotoResponse>
