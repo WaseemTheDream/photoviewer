@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Photo Viewer</string>
+
+    <string name="loadingData">Loading photos from server</string>
 </resources>
