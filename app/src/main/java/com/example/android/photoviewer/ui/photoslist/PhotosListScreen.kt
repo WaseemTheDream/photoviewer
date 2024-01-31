@@ -17,6 +17,7 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.android.photoviewer.R
 import com.example.android.photoviewer.data.model.Photo
 import com.example.android.photoviewer.ui.common.ErrorMessage
+import com.example.android.photoviewer.ui.common.LoadingNextPageItem
 import com.example.android.photoviewer.ui.common.PageLoader
 
 
@@ -37,7 +38,7 @@ fun PhotosListScreen(
                 loadState.refresh is LoadState.Loading -> {
                     item { PageLoader(modifier = Modifier.fillParentMaxSize()) }
                 }
-                
+
                 loadState.refresh is LoadState.Error -> {
                     val error = photoPagingItems.loadState.refresh as LoadState.Error
                     item {
@@ -47,7 +48,24 @@ fun PhotosListScreen(
                         ErrorMessage(
                             modifier = Modifier.fillParentMaxSize(),
                             message = errorMessage,
-                            onClickRetry = { retry() }) 
+                            onClickRetry = { retry() })
+                    }
+                }
+
+                loadState.append is LoadState.Loading -> {
+                    item { LoadingNextPageItem() }
+                }
+
+                loadState.append is LoadState.Error -> {
+                    val error = photoPagingItems.loadState.append as LoadState.Error
+                    item {
+                        val errorMessage =
+                            error.error.localizedMessage ?:
+                            stringResource(id = R.string.unknown_error)
+                        ErrorMessage(
+                            modifier = Modifier,
+                            message = errorMessage,
+                            onClickRetry = { retry() })
                     }
                 }
             }
