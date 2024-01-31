@@ -1,5 +1,6 @@
 package com.example.android.photoviewer.data.repository
 
+import android.util.Log
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.example.android.photoviewer.core.app.Constants
@@ -19,11 +20,19 @@ class PhotoPagingSource(
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Photo> {
         return try {
             val currentPage = params.key ?: 1
-            val photos = remoteDataSource.getPhotos(
+            val response = remoteDataSource.getPhotos(
                 apiKey = Constants.PHOTOS_API_KEY,
                 pageNumber = currentPage)
-            val photosResponse = photos.body()
-                ?: return LoadResult.Error(IllegalStateException("Photos response was empty."))
+
+            if (!response.isSuccessful) {
+                return when {
+                    (response.code() == 401) -> LoadResult.Error(IllegalStateException("HTTP 401: Unauthorized"))
+                    else -> LoadResult.Error(HttpException(response))
+                }
+            }
+
+            val photosResponse = response.body()
+                ?: return LoadResult.Error(HttpException(response))
 
             LoadResult.Page(
                 data = photosResponse.photos,

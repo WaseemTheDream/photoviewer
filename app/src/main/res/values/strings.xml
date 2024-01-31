@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">Photo Viewer</string>
 
-    <string name="loadingData">Loading photos from server</string>
+    <string name="loading_data">Loading photos from server</string>
+    <string name="retry">Retry</string>
+    <string name="unknown_error">Unknown Error</string>
 </resources>

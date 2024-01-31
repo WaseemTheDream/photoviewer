@@ -5,16 +5,18 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
+import com.example.android.photoviewer.R
 import com.example.android.photoviewer.data.model.Photo
+import com.example.android.photoviewer.ui.common.ErrorMessage
 import com.example.android.photoviewer.ui.common.PageLoader
 
 
@@ -34,6 +36,19 @@ fun PhotosListScreen(
             when {
                 loadState.refresh is LoadState.Loading -> {
                     item { PageLoader(modifier = Modifier.fillParentMaxSize()) }
+                }
+                
+                loadState.refresh is LoadState.Error -> {
+                    val error = photoPagingItems.loadState.refresh as LoadState.Error
+                    item {
+                        val errorMessage =
+                            error.error.localizedMessage ?:
+                            stringResource(id = R.string.unknown_error)
+                        ErrorMessage(
+                            modifier = Modifier.fillParentMaxSize(),
+                            message = errorMessage,
+                            onClickRetry = { retry() }) 
+                    }
                 }
             }
         }
