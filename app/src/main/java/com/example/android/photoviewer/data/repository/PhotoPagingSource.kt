@@ -8,6 +8,7 @@ import com.example.android.photoviewer.data.model.Photo
 import com.example.android.photoviewer.data.remote.PhotoRemoteDataSource
 import retrofit2.HttpException
 import java.io.IOException
+import kotlin.random.Random
 
 class PhotoPagingSource(
     private val remoteDataSource: PhotoRemoteDataSource,
@@ -28,6 +29,13 @@ class PhotoPagingSource(
                 return when {
                     (response.code() == 401) -> LoadResult.Error(IllegalStateException("HTTP 401: Unauthorized"))
                     else -> LoadResult.Error(HttpException(response))
+                }
+            }
+
+            if (Constants.DEBUG) {
+                val random = Random.nextInt(0, 100)
+                if (random >= 50) {
+                    return LoadResult.Error(IllegalStateException("Random Error"))
                 }
             }
 
