@@ -1,12 +1,14 @@
 package com.example.android.photoviewer.ui.photoslist
 
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -23,8 +25,10 @@ fun ItemPhoto(index: Int, photo: Photo) {
         elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
     ) {
         AsyncImage(
+            modifier = Modifier.height(400.dp),
             model = photo.source.original,
-            contentDescription = photo.description)
+            contentDescription = photo.description,
+            contentScale = ContentScale.Crop)
 
         Text(
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),

@@ -46,7 +46,7 @@ fun PhotosListScreen(
                             error.error.localizedMessage ?:
                             stringResource(id = R.string.unknown_error)
                         ErrorMessage(
-                            modifier = Modifier.fillParentMaxSize(),
+                            modifier = Modifier.fillParentMaxSize().padding(20.dp),
                             message = errorMessage,
                             onClickRetry = { retry() })
                     }
@@ -63,7 +63,7 @@ fun PhotosListScreen(
                             error.error.localizedMessage ?:
                             stringResource(id = R.string.unknown_error)
                         ErrorMessage(
-                            modifier = Modifier,
+                            modifier = Modifier.padding(20.dp),
                             message = errorMessage,
                             onClickRetry = { retry() })
                     }
