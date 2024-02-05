@@ -48,7 +48,6 @@ fun PhotosListScreen(
     mainViewModel: MainViewModel,
     viewModel: PhotosListViewModel = hiltViewModel()
 ) {
-    val appTheme by mainViewModel.appTheme.collectAsState()
 
     Scaffold(
         topBar = {
@@ -76,23 +75,7 @@ fun PhotosListScreen(
                         .weight(1.0f),
                     textAlign = TextAlign.Center)
 
-                IconButton(onClick = {
-                    if (appTheme == AppTheme.Light) {
-                        mainViewModel.updateAppTheme(AppTheme.Dark)
-                    } else {
-                        mainViewModel.updateAppTheme(AppTheme.Light)
-                    }
-                }) {
-                    Icon(
-                        painter = if (appTheme == AppTheme.Light)
-                            painterResource(id = R.drawable.ic_dark_mode)
-                        else
-                            painterResource(id = R.drawable.ic_light_mode),
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onPrimary,
-                        modifier = Modifier.size(25.dp)
-                    )
-                }
+                ThemeSwitcher(mainViewModel = mainViewModel)
             }
         }
     ) {
@@ -101,10 +84,34 @@ fun PhotosListScreen(
 }
 
 @Composable
+fun ThemeSwitcher(mainViewModel: MainViewModel) {
+    val appTheme by mainViewModel.appTheme.collectAsState()
+    IconButton(onClick = {
+        if (appTheme == AppTheme.Light) {
+            mainViewModel.updateAppTheme(AppTheme.Dark)
+        } else {
+            mainViewModel.updateAppTheme(AppTheme.Light)
+        }
+    }) {
+        Icon(
+            painter = if (appTheme == AppTheme.Light)
+                painterResource(id = R.drawable.ic_dark_mode)
+            else
+                painterResource(id = R.drawable.ic_light_mode),
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.onPrimary,
+            modifier = Modifier.size(25.dp)
+        )
+    }
+}
+
+@Composable
 fun PhotosListScreenContent(paddingValues: PaddingValues, viewModel: PhotosListViewModel) {
     val photoPagingItems: LazyPagingItems<Photo> = viewModel.photosState.collectAsLazyPagingItems()
     LazyColumn(
-        modifier = Modifier.fillMaxSize().padding(paddingValues),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(paddingValues),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(20.dp)) {
         item { Spacer(modifier = Modifier.padding(2.dp)) }
