@@ -4,4 +4,7 @@
     <string name="loading_data">Loading photos from server</string>
     <string name="retry">Retry</string>
     <string name="unknown_error">Unknown Error</string>
+    <string name="select_display_style">Select Display Style</string>
+    <string name="display_style_card">Card</string>
+    <string name="display_style_grid">Grid</string>
 </resources>
