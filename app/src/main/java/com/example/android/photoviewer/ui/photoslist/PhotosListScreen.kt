@@ -118,7 +118,7 @@ fun ThemeSwitcher(mainViewModel: MainViewModel) {
 fun DisplayStyleSelector(
     viewModel: PhotosListViewModel,
     onStyleChanged: (DisplayStyle) -> Unit) {
-    val selectedStyle by viewModel.displayStyleState.collectAsState(DisplayStyle.Card)
+    val selectedStyle by viewModel.displayStyleState.collectAsState()
     var expanded by remember { mutableStateOf(false) }
     IconButton(onClick = { expanded = true }) { 
         Icon(

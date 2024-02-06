@@ -12,6 +12,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -28,23 +30,33 @@ class PhotosListViewModel @Inject constructor(
 
     val photosState: MutableStateFlow<PagingData<Photo>> get() = _photosState
 
-    val displayStyleState: Flow<DisplayStyle> = appSettingsRepository.displayStyle
+    private val _displayStyleState: MutableStateFlow<DisplayStyle> =
+        MutableStateFlow(DisplayStyle.Card)
+    val displayStyleState: StateFlow<DisplayStyle> = _displayStyleState
 
     init {
+        getPhotos()
+        readDisplayStyle()
+    }
+
+    private fun getPhotos() {
         viewModelScope.launch {
-            getPhotos()
+            photoRepository.getPhotos()
+                .distinctUntilChanged()
+                .cachedIn(viewModelScope)
+                .collect {
+                    _photosState.value = it
+                }
         }
     }
 
-    private suspend fun getPhotos() {
-        photoRepository.getPhotos()
-            .distinctUntilChanged()
-            .cachedIn(viewModelScope)
-            .collect {
-                _photosState.value = it
+    private fun readDisplayStyle() {
+        viewModelScope.launch(Dispatchers.IO) {
+            appSettingsRepository.displayStyle.collect {
+                _displayStyleState.value = it
             }
+        }
     }
-
 
     fun updateDisplayStyle(displayStyle: DisplayStyle) {
         viewModelScope.launch(Dispatchers.IO) {
