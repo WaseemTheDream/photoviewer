@@ -1,6 +1,5 @@
 package com.example.android.photoviewer.ui.photoslist
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
@@ -12,6 +11,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.DropdownMenu
@@ -88,7 +89,12 @@ fun PhotosListScreen(
             }
         }
     ) {
-        PhotosListScreenContent(it, viewModel)
+        val selectedStyle by viewModel.displayStyleState.collectAsState()
+
+        when (selectedStyle) {
+            DisplayStyle.Card -> PhotosCardListScreenContent(it, viewModel)
+            DisplayStyle.Grid -> PhotosGridScreenContent(it, viewModel)
+        }
     }
 }
 
@@ -151,7 +157,31 @@ fun DisplayStyleDropdownMenuItemTrailingIcon(styleItem: DisplayStyle, selectedSt
 }
 
 @Composable
-fun PhotosListScreenContent(paddingValues: PaddingValues, viewModel: PhotosListViewModel) {
+fun PhotosGridScreenContent(paddingValues: PaddingValues, viewModel: PhotosListViewModel) {
+    val photoPagingItems: LazyPagingItems<Photo> = viewModel.photosState.collectAsLazyPagingItems()
+
+    if (photoPagingItems.loadState.refresh is LoadState.Loading) {
+        PageLoader(modifier = Modifier.fillMaxSize())
+        return
+    }
+
+    LazyVerticalGrid(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(paddingValues),
+        columns = GridCells.Fixed(3),
+        verticalArrangement = Arrangement.spacedBy(4.dp),
+        horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+        items(photoPagingItems.itemCount) {
+            index -> ItemPhotoCell(photo = photoPagingItems[index]!!)
+        }
+        photoPagingItems.apply {
+        }
+    }
+}
+
+@Composable
+fun PhotosCardListScreenContent(paddingValues: PaddingValues, viewModel: PhotosListViewModel) {
     val photoPagingItems: LazyPagingItems<Photo> = viewModel.photosState.collectAsLazyPagingItems()
     LazyColumn(
         modifier = Modifier
@@ -161,7 +191,7 @@ fun PhotosListScreenContent(paddingValues: PaddingValues, viewModel: PhotosListV
         verticalArrangement = Arrangement.spacedBy(20.dp)) {
         item { Spacer(modifier = Modifier.padding(2.dp)) }
         items(photoPagingItems.itemCount) { index ->
-            ItemPhoto(index = index, photo = photoPagingItems[index]!!)
+            ItemPhotoCard(index = index, photo = photoPagingItems[index]!!)
         }
         photoPagingItems.apply {
             when {

@@ -19,7 +19,7 @@ import coil.compose.AsyncImage
 import com.example.android.photoviewer.data.model.Photo
 
 @Composable
-fun ItemPhoto(index: Int, photo: Photo) {
+fun ItemPhotoCard(index: Int, photo: Photo) {
     ElevatedCard(
         modifier = Modifier.fillMaxWidth(0.9f),
         elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
