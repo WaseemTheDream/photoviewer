@@ -82,7 +82,9 @@ fun PhotosListScreen(
                     textAlign = TextAlign.Center)
 
                 ThemeSwitcher(mainViewModel = mainViewModel)
-                DisplayStyleSelector(onStyleChanged = {})
+                DisplayStyleSelector(viewModel, onStyleChanged = {
+                    newStyle -> viewModel.updateDisplayStyle(newStyle)
+                })
             }
         }
     ) {
@@ -113,8 +115,10 @@ fun ThemeSwitcher(mainViewModel: MainViewModel) {
 }
 
 @Composable
-fun DisplayStyleSelector(onStyleChanged: (DisplayStyle) -> Unit) {
-    val selectedStyle: DisplayStyle = DisplayStyle.Card
+fun DisplayStyleSelector(
+    viewModel: PhotosListViewModel,
+    onStyleChanged: (DisplayStyle) -> Unit) {
+    val selectedStyle by viewModel.displayStyleState.collectAsState(DisplayStyle.Card)
     var expanded by remember { mutableStateOf(false) }
     IconButton(onClick = { expanded = true }) { 
         Icon(
@@ -141,8 +145,9 @@ fun DisplayStyleDropdownMenuItemTrailingIcon(styleItem: DisplayStyle, selectedSt
     if (styleItem != selectedStyle) {
         return
     }
-    Icon(painter = painterResource(id = R.drawable.baseline_check),
-                        contentDescription = null)
+    Icon(
+        painter = painterResource(id = R.drawable.baseline_check),
+        contentDescription = null)
 }
 
 @Composable

@@ -8,6 +8,7 @@ object Constants {
 
     const val DEBUG = true
 
-    const val APP_THEME_PREFERENCE_NAME = "app_theme"
+    const val APP_SETTINGS = "app_settings"
     const val APP_THEME_PREFERENCE_KEY = "app_theme_setting"
+    const val DISPLAY_STYLE_KEY = "display_style_setting"
 }
