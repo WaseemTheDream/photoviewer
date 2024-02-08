@@ -49,6 +49,7 @@ import com.example.android.photoviewer.ui.common.LoadingNextPageItem
 import com.example.android.photoviewer.ui.common.PageLoader
 import com.example.android.photoviewer.ui.main.MainViewModel
 import com.example.android.photoviewer.ui.model.DisplayStyle
+import com.example.android.photoviewer.ui.nav.AppScreen
 import com.example.android.photoviewer.ui.theme.AppTheme
 
 
@@ -95,9 +96,13 @@ fun PhotosListScreen(
     ) {
         val selectedStyle by viewModel.displayStyleState.collectAsState()
 
+        val clickListener: (Photo) -> Unit = {
+            navController.navigate(AppScreen.DetailsScreen.route)
+        }
+
         when (selectedStyle) {
-            DisplayStyle.Card -> PhotosCardListScreenContent(it, viewModel)
-            DisplayStyle.Grid -> PhotosGridScreenContent(it, viewModel)
+            DisplayStyle.Card -> PhotosCardListScreenContent(it, viewModel, clickListener)
+            DisplayStyle.Grid -> PhotosGridScreenContent(it, viewModel, clickListener)
         }
     }
 }
@@ -164,7 +169,10 @@ private const val COLUMN_COUNT = 3
 private val span: (LazyGridItemSpanScope) -> GridItemSpan = { GridItemSpan(COLUMN_COUNT) }
 
 @Composable
-fun PhotosGridScreenContent(paddingValues: PaddingValues, viewModel: PhotosListViewModel) {
+fun PhotosGridScreenContent(
+    paddingValues: PaddingValues,
+    viewModel: PhotosListViewModel,
+    photoClickListener: (Photo) -> Unit) {
     val photoPagingItems: LazyPagingItems<Photo> = viewModel.photosState.collectAsLazyPagingItems()
 
     if (photoPagingItems.loadState.refresh is LoadState.Loading) {
@@ -195,7 +203,7 @@ fun PhotosGridScreenContent(paddingValues: PaddingValues, viewModel: PhotosListV
         horizontalArrangement = Arrangement.spacedBy(4.dp)) {
         items(photoPagingItems.itemCount) {
             index ->
-                ItemPhotoCell(photo = photoPagingItems[index]!!)
+                ItemPhotoCell(photo = photoPagingItems[index]!!, photoClickListener)
         }
         photoPagingItems.apply {
             when {
@@ -221,7 +229,10 @@ fun PhotosGridScreenContent(paddingValues: PaddingValues, viewModel: PhotosListV
 }
 
 @Composable
-fun PhotosCardListScreenContent(paddingValues: PaddingValues, viewModel: PhotosListViewModel) {
+fun PhotosCardListScreenContent(
+    paddingValues: PaddingValues,
+    viewModel: PhotosListViewModel,
+    photoClickListener: (Photo) -> Unit) {
     val photoPagingItems: LazyPagingItems<Photo> = viewModel.photosState.collectAsLazyPagingItems()
     LazyColumn(
         modifier = Modifier
@@ -231,7 +242,7 @@ fun PhotosCardListScreenContent(paddingValues: PaddingValues, viewModel: PhotosL
         verticalArrangement = Arrangement.spacedBy(20.dp)) {
         item { Spacer(modifier = Modifier.padding(2.dp)) }
         items(photoPagingItems.itemCount) { index ->
-            ItemPhotoCard(index = index, photo = photoPagingItems[index]!!)
+            ItemPhotoCard(index = index, photo = photoPagingItems[index]!!, photoClickListener)
         }
         photoPagingItems.apply {
             when {
