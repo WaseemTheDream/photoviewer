@@ -38,6 +38,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
@@ -55,6 +56,7 @@ import com.example.android.photoviewer.ui.theme.AppTheme
 @Composable
 fun PhotosListScreen(
     mainViewModel: MainViewModel,
+    navController: NavController,
     viewModel: PhotosListViewModel = hiltViewModel()
 ) {
 

@@ -15,6 +15,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.android.photoviewer.data.remote.PhotoRemoteDataSource
+import com.example.android.photoviewer.ui.nav.NavGraph
 import com.example.android.photoviewer.ui.photoslist.PhotosListScreen
 import com.example.android.photoviewer.ui.theme.PhotoViewerTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -39,7 +40,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    PhotosListScreen(viewModel)
+                    NavGraph(mainViewModel = viewModel)
                 }
             }
         }
