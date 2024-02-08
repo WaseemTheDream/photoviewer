@@ -62,7 +62,7 @@ fun LoadingNextPageItem(modifier: Modifier = Modifier) {
     CircularProgressIndicator(
         modifier = modifier
             .fillMaxWidth()
-            .padding(10.dp)
+            .padding(20.dp)
             .wrapContentWidth(Alignment.CenterHorizontally)
     )
 }

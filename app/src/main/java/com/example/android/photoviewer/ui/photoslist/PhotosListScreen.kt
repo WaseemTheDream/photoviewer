@@ -12,6 +12,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.foundation.lazy.grid.LazyGridItemSpanScope
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
@@ -156,6 +158,9 @@ fun DisplayStyleDropdownMenuItemTrailingIcon(styleItem: DisplayStyle, selectedSt
         contentDescription = null)
 }
 
+private const val COLUMN_COUNT = 3
+private val span: (LazyGridItemSpanScope) -> GridItemSpan = { GridItemSpan(COLUMN_COUNT) }
+
 @Composable
 fun PhotosGridScreenContent(paddingValues: PaddingValues, viewModel: PhotosListViewModel) {
     val photoPagingItems: LazyPagingItems<Photo> = viewModel.photosState.collectAsLazyPagingItems()
@@ -183,13 +188,32 @@ fun PhotosGridScreenContent(paddingValues: PaddingValues, viewModel: PhotosListV
         modifier = Modifier
             .fillMaxSize()
             .padding(paddingValues),
-        columns = GridCells.Fixed(3),
+        columns = GridCells.Fixed(COLUMN_COUNT),
         verticalArrangement = Arrangement.spacedBy(4.dp),
         horizontalArrangement = Arrangement.spacedBy(4.dp)) {
         items(photoPagingItems.itemCount) {
-            index -> ItemPhotoCell(photo = photoPagingItems[index]!!)
+            index ->
+                ItemPhotoCell(photo = photoPagingItems[index]!!)
         }
         photoPagingItems.apply {
+            when {
+                loadState.append is LoadState.Loading -> {
+                    item(span = span) { LoadingNextPageItem() }
+                }
+
+                loadState.append is LoadState.Error -> {
+                    val error = photoPagingItems.loadState.append as LoadState.Error
+                    item(span = span) {
+                        val errorMessage =
+                            error.error.localizedMessage ?:
+                            stringResource(id = R.string.unknown_error)
+                        ErrorMessage(
+                            modifier = Modifier.padding(20.dp),
+                            message = errorMessage,
+                            onClickRetry = { retry() })
+                    }
+                }
+            }
         }
     }
 }
