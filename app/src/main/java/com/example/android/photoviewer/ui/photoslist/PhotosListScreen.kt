@@ -83,9 +83,9 @@ fun PhotosListScreen(
                     textAlign = TextAlign.Center)
 
                 ThemeSwitcher(mainViewModel = mainViewModel)
-                DisplayStyleSelector(viewModel, onStyleChanged = {
+                DisplayStyleSelector(viewModel) {
                     newStyle -> viewModel.updateDisplayStyle(newStyle)
-                })
+                }
             }
         }
     ) {
@@ -162,6 +162,20 @@ fun PhotosGridScreenContent(paddingValues: PaddingValues, viewModel: PhotosListV
 
     if (photoPagingItems.loadState.refresh is LoadState.Loading) {
         PageLoader(modifier = Modifier.fillMaxSize())
+        return
+    }
+
+    if (photoPagingItems.loadState.refresh is LoadState.Error) {
+        val error = photoPagingItems.loadState.refresh as LoadState.Error
+        val errorMessage =
+            error.error.localizedMessage ?:
+            stringResource(id = R.string.unknown_error)
+        ErrorMessage(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(20.dp),
+            message = errorMessage,
+            onClickRetry = { photoPagingItems.retry() })
         return
     }
 

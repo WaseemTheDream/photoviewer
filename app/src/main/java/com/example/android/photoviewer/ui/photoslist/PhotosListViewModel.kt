@@ -52,7 +52,8 @@ class PhotosListViewModel @Inject constructor(
 
     private fun readDisplayStyle() {
         viewModelScope.launch(Dispatchers.IO) {
-            appSettingsRepository.displayStyle.collect {
+            appSettingsRepository.displayStyle
+                .distinctUntilChanged().collect {
                 _displayStyleState.value = it
             }
         }
