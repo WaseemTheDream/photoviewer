@@ -1,6 +1,8 @@
 package com.example.android.photoviewer.core.di
 
 import com.example.android.photoviewer.core.network.PhotoApi
+import com.example.android.photoviewer.data.local.PhotoLocalDataSource
+import com.example.android.photoviewer.data.local.PhotoLocalDataSourceImpl
 import com.example.android.photoviewer.data.remote.PhotoRemoteDataSource
 import com.example.android.photoviewer.data.remote.PhotoRemoteDataSourceImpl
 import com.example.android.photoviewer.data.repository.PhotoRepository
@@ -23,9 +25,14 @@ object AppModule {
 
     @Singleton
     @Provides
+    fun providePhotoLocalDataSource(): PhotoLocalDataSource = PhotoLocalDataSourceImpl()
+
+    @Singleton
+    @Provides
     fun providePhotoRepository(
-        photoRemoteDataSource: PhotoRemoteDataSource
+        photoRemoteDataSource: PhotoRemoteDataSource,
+        photoLocalDataSource: PhotoLocalDataSource,
     ): PhotoRepository {
-        return PhotoRepositoryImpl(photoRemoteDataSource)
+        return PhotoRepositoryImpl(photoRemoteDataSource, photoLocalDataSource)
     }
 }

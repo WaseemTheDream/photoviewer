@@ -29,9 +29,9 @@ fun NavGraph(mainViewModel: MainViewModel) {
         
         composable(
             route = AppScreen.DetailsScreen.route,
-            arguments = listOf(navArgument(AppScreenParams.PHOTO) { type = NavType.StringType })
+            arguments = listOf(navArgument(AppScreenParams.PHOTO) { type = NavType.IntType })
         ) {
-            val photoId = it.arguments?.getString(AppScreenParams.PHOTO)
+            val photoId = it.arguments?.getInt(AppScreenParams.PHOTO)
             Text(text = "Details Screen: $photoId")
         }
     }

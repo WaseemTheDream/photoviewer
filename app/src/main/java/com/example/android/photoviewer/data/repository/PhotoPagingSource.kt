@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.example.android.photoviewer.core.app.Constants
+import com.example.android.photoviewer.data.local.PhotoLocalDataSource
 import com.example.android.photoviewer.data.model.Photo
 import com.example.android.photoviewer.data.remote.PhotoRemoteDataSource
 import retrofit2.HttpException
@@ -12,6 +13,7 @@ import kotlin.random.Random
 
 class PhotoPagingSource(
     private val remoteDataSource: PhotoRemoteDataSource,
+    private val localDataSource: PhotoLocalDataSource,
 ) : PagingSource<Int, Photo>() {
 
     override fun getRefreshKey(state: PagingState<Int, Photo>): Int? {
@@ -41,6 +43,8 @@ class PhotoPagingSource(
 
             val photosResponse = response.body()
                 ?: return LoadResult.Error(HttpException(response))
+
+            photosResponse.photos.forEach { localDataSource.putPhoto(it) }
 
             LoadResult.Page(
                 data = photosResponse.photos,
