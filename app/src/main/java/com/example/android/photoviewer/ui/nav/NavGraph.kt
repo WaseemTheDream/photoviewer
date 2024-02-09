@@ -8,6 +8,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.android.photoviewer.ui.main.MainViewModel
+import com.example.android.photoviewer.ui.photosdetails.PhotosDetailsScreen
 import com.example.android.photoviewer.ui.photoslist.PhotosListScreen
 
 @Composable
@@ -32,7 +33,7 @@ fun NavGraph(mainViewModel: MainViewModel) {
             arguments = listOf(navArgument(AppScreenParams.PHOTO) { type = NavType.IntType })
         ) {
             val photoId = it.arguments?.getInt(AppScreenParams.PHOTO)
-            Text(text = "Details Screen: $photoId")
+            PhotosDetailsScreen(mainViewModel, photoId = photoId)
         }
     }
 }
