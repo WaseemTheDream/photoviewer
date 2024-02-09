@@ -58,8 +58,8 @@ import com.example.android.photoviewer.ui.theme.AppTheme
 @Composable
 fun PhotosListScreen(
     mainViewModel: MainViewModel,
-    navController: NavController,
-    viewModel: PhotosListViewModel = hiltViewModel()
+    viewModel: PhotosListViewModel = hiltViewModel(),
+    navigateToDetailsScreen: (photoId: String) -> Unit
 ) {
 
     Scaffold(
@@ -98,7 +98,7 @@ fun PhotosListScreen(
         val selectedStyle by viewModel.displayStyleState.collectAsState()
 
         val clickListener: (Photo) -> Unit = { photo ->
-            navController.navigate(AppScreenName.detailsScreen(photo.id.toString()))
+            navigateToDetailsScreen(photo.id.toString())
         }
 
         when (selectedStyle) {

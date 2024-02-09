@@ -17,10 +17,14 @@ fun NavGraph(mainViewModel: MainViewModel) {
         navController = navController,
         startDestination = AppScreen.HomeScreen.route) {
 
+        val navigateToDetailsScreen: (String) -> Unit = {
+            navController.navigate(AppScreenName.detailsScreen(it))
+        }
+
         composable(route = AppScreen.HomeScreen.route) {
             PhotosListScreen(
                 mainViewModel = mainViewModel,
-                navController = navController)
+                navigateToDetailsScreen = navigateToDetailsScreen)
         }
         
         composable(
