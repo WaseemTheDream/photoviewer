@@ -50,6 +50,7 @@ import com.example.android.photoviewer.ui.common.PageLoader
 import com.example.android.photoviewer.ui.main.MainViewModel
 import com.example.android.photoviewer.ui.model.DisplayStyle
 import com.example.android.photoviewer.ui.nav.AppScreen
+import com.example.android.photoviewer.ui.nav.AppScreenName
 import com.example.android.photoviewer.ui.theme.AppTheme
 
 
@@ -96,8 +97,8 @@ fun PhotosListScreen(
     ) {
         val selectedStyle by viewModel.displayStyleState.collectAsState()
 
-        val clickListener: (Photo) -> Unit = {
-            navController.navigate(AppScreen.DetailsScreen.route)
+        val clickListener: (Photo) -> Unit = { photo ->
+            navController.navigate(AppScreenName.detailsScreen(photo.id.toString()))
         }
 
         when (selectedStyle) {
