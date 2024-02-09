@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -19,13 +20,17 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import coil.compose.AsyncImage
 import com.example.android.photoviewer.R
 import com.example.android.photoviewer.ui.main.MainViewModel
 import com.example.android.photoviewer.ui.photoslist.ThemeSwitcher
+import net.engawapg.lib.zoomable.rememberZoomState
+import net.engawapg.lib.zoomable.zoomable
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -84,6 +89,17 @@ fun PhotosDetailsScreenContent(
             Text("Photo not found")
             return
         }
-        Text(text = "Photo found: ${photo.id} ${photo.url}")
+
+        val zoomState = rememberZoomState()
+        AsyncImage(
+            modifier = Modifier
+                .fillMaxSize()
+                .zoomable(zoomState = zoomState),
+            model = photo.source.original,
+            contentDescription = photo.description,
+            contentScale = ContentScale.Fit,
+            onSuccess = { state ->
+                zoomState.setContentSize(state.painter.intrinsicSize)
+            })
     }
 }
