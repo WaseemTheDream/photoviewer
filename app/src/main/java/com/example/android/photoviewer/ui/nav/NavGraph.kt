@@ -27,13 +27,20 @@ fun NavGraph(mainViewModel: MainViewModel) {
                 mainViewModel = mainViewModel,
                 navigateToDetailsScreen = navigateToDetailsScreen)
         }
+
+        val navigateBack: () -> Unit = {
+            navController.popBackStack()
+        }
         
         composable(
             route = AppScreen.DetailsScreen.route,
             arguments = listOf(navArgument(AppScreenParams.PHOTO) { type = NavType.IntType })
         ) {
             val photoId = it.arguments?.getInt(AppScreenParams.PHOTO)
-            PhotosDetailsScreen(mainViewModel, photoId = photoId)
+            PhotosDetailsScreen(
+                mainViewModel,
+                photoId = photoId,
+                navigateBack)
         }
     }
 }
