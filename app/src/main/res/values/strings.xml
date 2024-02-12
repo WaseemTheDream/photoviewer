@@ -7,4 +7,7 @@
     <string name="select_display_style">Select Display Style</string>
     <string name="display_style_card">Card</string>
     <string name="display_style_grid">Grid</string>
+    <string name="more_options">More Options</string>
+    <string name="share">Share</string>
+    <string name="download">Download</string>
 </resources>

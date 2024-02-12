@@ -38,7 +38,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
@@ -47,11 +46,9 @@ import com.example.android.photoviewer.data.model.Photo
 import com.example.android.photoviewer.ui.common.ErrorMessage
 import com.example.android.photoviewer.ui.common.LoadingNextPageItem
 import com.example.android.photoviewer.ui.common.PageLoader
+import com.example.android.photoviewer.ui.common.ThemeSwitcher
 import com.example.android.photoviewer.ui.main.MainViewModel
 import com.example.android.photoviewer.ui.model.DisplayStyle
-import com.example.android.photoviewer.ui.nav.AppScreen
-import com.example.android.photoviewer.ui.nav.AppScreenName
-import com.example.android.photoviewer.ui.theme.AppTheme
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -105,28 +102,6 @@ fun PhotosListScreen(
             DisplayStyle.Card -> PhotosCardListScreenContent(it, viewModel, clickListener)
             DisplayStyle.Grid -> PhotosGridScreenContent(it, viewModel, clickListener)
         }
-    }
-}
-
-@Composable
-fun ThemeSwitcher(mainViewModel: MainViewModel) {
-    val appTheme by mainViewModel.appTheme.collectAsState()
-    IconButton(onClick = {
-        if (appTheme == AppTheme.Light) {
-            mainViewModel.updateAppTheme(AppTheme.Dark)
-        } else {
-            mainViewModel.updateAppTheme(AppTheme.Light)
-        }
-    }) {
-        Icon(
-            painter = if (appTheme == AppTheme.Light)
-                painterResource(id = R.drawable.ic_dark_mode)
-            else
-                painterResource(id = R.drawable.ic_light_mode),
-            contentDescription = null,
-            tint = MaterialTheme.colorScheme.onPrimary,
-            modifier = Modifier.size(25.dp)
-        )
     }
 }
 
