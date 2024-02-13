@@ -6,7 +6,7 @@ object Constants {
 
     const val MAX_PAGE_SIZE = 18
 
-    const val DEBUG = true
+    const val DEBUG = false
 
     const val APP_SETTINGS = "app_settings"
     const val APP_THEME_PREFERENCE_KEY = "app_theme_setting"

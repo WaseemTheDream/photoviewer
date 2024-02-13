@@ -1,5 +1,6 @@
 package com.example.android.photoviewer.ui.photosdetails
 
+import android.content.Intent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -27,6 +28,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -89,6 +91,19 @@ fun MoreOptionsSelector(photo: Photo?) {
     if (photo == null) {
         return
     }
+
+    val context = LocalContext.current
+
+    val shareAction: () -> Unit = {
+        val sendIntent: Intent = Intent().apply {
+            action = Intent.ACTION_SEND
+            putExtra(Intent.EXTRA_TEXT, context.getString(R.string.share_text, photo.url))
+            type = "text/plain"
+        }
+        val shareIntent = Intent.createChooser(sendIntent, null)
+        context.startActivity(shareIntent)
+    }
+
     var expanded by  remember { mutableStateOf(false) }
     IconButton(onClick = { expanded = true }) {
         Icon(
@@ -100,7 +115,7 @@ fun MoreOptionsSelector(photo: Photo?) {
             onDismissRequest = { expanded = false }) {
             DropdownMenuItem(
                 text = { Text(text = stringResource(id = R.string.share)) },
-                onClick = { /*TODO*/ })
+                onClick = shareAction)
             DropdownMenuItem(
                 text = { Text(text = stringResource(id = R.string.download)) },
                 onClick = { /*TODO*/ })
