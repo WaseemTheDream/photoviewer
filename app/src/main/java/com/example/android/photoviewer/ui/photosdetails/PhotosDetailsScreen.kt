@@ -1,6 +1,16 @@
 package com.example.android.photoviewer.ui.photosdetails
 
+import android.Manifest
+import android.app.Activity
+import android.app.DownloadManager
+import android.content.Context.DOWNLOAD_SERVICE
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.net.Uri
+import android.os.Build
+import android.os.Environment
+import android.webkit.URLUtil
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -33,6 +43,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.example.android.photoviewer.R
@@ -87,21 +99,22 @@ fun PhotosDetailsScreen(
 }
 
 @Composable
-fun MoreOptionsSelector(photo: Photo?) {
+fun MoreOptionsSelector(
+    photo: Photo?) {
     if (photo == null) {
         return
     }
 
-    val context = LocalContext.current
+    val activity = LocalContext.current as Activity
 
     val shareAction: () -> Unit = {
         val sendIntent: Intent = Intent().apply {
             action = Intent.ACTION_SEND
-            putExtra(Intent.EXTRA_TEXT, context.getString(R.string.share_text, photo.url))
+            putExtra(Intent.EXTRA_TEXT, activity.getString(R.string.share_text, photo.url))
             type = "text/plain"
         }
         val shareIntent = Intent.createChooser(sendIntent, null)
-        context.startActivity(shareIntent)
+        activity.startActivity(shareIntent)
     }
 
     var expanded by  remember { mutableStateOf(false) }
@@ -118,7 +131,7 @@ fun MoreOptionsSelector(photo: Photo?) {
                 onClick = shareAction)
             DropdownMenuItem(
                 text = { Text(text = stringResource(id = R.string.download)) },
-                onClick = { /*TODO*/ })
+                onClick = { downloadFile(activity, photo) })
         }
     }
 }
@@ -146,4 +159,34 @@ fun PhotosDetailsScreenContent(
                 zoomState.setContentSize(state.painter.intrinsicSize)
             })
     }
+}
+
+private fun downloadFile(activity: Activity, photo: Photo) {
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q &&
+        ContextCompat.checkSelfPermission(
+            activity,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_DENIED) {
+        ActivityCompat.requestPermissions(
+            activity,
+            arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
+            1)
+        Toast.makeText(
+            activity,
+            R.string.permission_denied,
+            Toast.LENGTH_LONG
+        ).show()
+        return
+    }
+
+    val url = photo.source.original
+    val request = DownloadManager.Request(Uri.parse(url))
+        .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
+        .setDestinationInExternalPublicDir(
+            Environment.DIRECTORY_DOWNLOADS,
+            URLUtil.guessFileName(url, null, null))
+
+    val downloadManager = activity.getSystemService(DOWNLOAD_SERVICE) as DownloadManager
+    downloadManager.enqueue(request)
+
+    Toast.makeText(activity, R.string.download_started, Toast.LENGTH_SHORT).show()
 }
