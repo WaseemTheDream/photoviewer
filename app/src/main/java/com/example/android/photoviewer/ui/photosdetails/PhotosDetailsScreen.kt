@@ -31,7 +31,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableLongState
+import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -49,6 +52,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.example.android.photoviewer.R
 import com.example.android.photoviewer.data.model.Photo
+import com.example.android.photoviewer.ui.common.SystemBroadcastReceiver
 import com.example.android.photoviewer.ui.main.MainViewModel
 import com.example.android.photoviewer.ui.common.ThemeSwitcher
 import net.engawapg.lib.zoomable.rememberZoomState
@@ -63,6 +67,7 @@ fun PhotosDetailsScreen(
     viewModel: PhotosDetailsViewModel = hiltViewModel(),
 ) {
     val photo: Photo? = photoId?.let { viewModel.getPhoto(it) }
+    val downloadId = remember{ mutableLongStateOf(-1) }
     Scaffold(
         topBar = {
             Row(
@@ -90,17 +95,28 @@ fun PhotosDetailsScreen(
                     textAlign = TextAlign.Center)
 
                 ThemeSwitcher(mainViewModel = mainViewModel)
-                MoreOptionsSelector(photo = photo)
+                MoreOptionsSelector(photo = photo, downloadId)
             }
         }
     ) {
         PhotosDetailsScreenContent(photo, paddingValues = it)
     }
+
+    if (downloadId.value != (-1).toLong()) {
+        val context = LocalContext.current
+        SystemBroadcastReceiver(DownloadManager.ACTION_DOWNLOAD_COMPLETE) { intent ->
+            val completedDownloadId = intent?.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1)
+            if (completedDownloadId == downloadId.value) {
+                Toast.makeText(context, R.string.download_completed, Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
 }
 
 @Composable
 fun MoreOptionsSelector(
-    photo: Photo?) {
+    photo: Photo?,
+    downloadId: MutableLongState) {
     if (photo == null) {
         return
     }
@@ -131,7 +147,7 @@ fun MoreOptionsSelector(
                 onClick = shareAction)
             DropdownMenuItem(
                 text = { Text(text = stringResource(id = R.string.download)) },
-                onClick = { downloadFile(activity, photo) })
+                onClick = { downloadFile(activity, photo, downloadId) })
         }
     }
 }
@@ -161,7 +177,7 @@ fun PhotosDetailsScreenContent(
     }
 }
 
-private fun downloadFile(activity: Activity, photo: Photo) {
+private fun downloadFile(activity: Activity, photo: Photo, downloadId: MutableLongState) {
     if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q &&
         ContextCompat.checkSelfPermission(
             activity,
@@ -186,7 +202,8 @@ private fun downloadFile(activity: Activity, photo: Photo) {
             URLUtil.guessFileName(url, null, null))
 
     val downloadManager = activity.getSystemService(DOWNLOAD_SERVICE) as DownloadManager
-    downloadManager.enqueue(request)
+    val newDownloadId = downloadManager.enqueue(request)
 
     Toast.makeText(activity, R.string.download_started, Toast.LENGTH_SHORT).show()
+    downloadId.value = newDownloadId
 }

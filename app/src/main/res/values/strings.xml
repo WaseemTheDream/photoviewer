@@ -13,4 +13,5 @@
     <string name="share_text">Check out this photo: %1$s</string>
     <string name="permission_denied">Permission denied. Grant permissions and try again.</string>
     <string name="download_started">Downloading file…</string>
+    <string name="download_completed">Download Completed.</string>
 </resources>
