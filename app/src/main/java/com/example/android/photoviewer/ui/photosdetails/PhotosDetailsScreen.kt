@@ -22,6 +22,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -30,8 +34,10 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableLongState
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
@@ -67,7 +73,8 @@ fun PhotosDetailsScreen(
     viewModel: PhotosDetailsViewModel = hiltViewModel(),
 ) {
     val photo: Photo? = photoId?.let { viewModel.getPhoto(it) }
-    val downloadId = remember{ mutableLongStateOf(-1) }
+    val downloadId = remember { mutableLongStateOf(-1) }
+    val openDownloadDialog = remember { mutableStateOf(false) }
     Scaffold(
         topBar = {
             Row(
@@ -95,7 +102,7 @@ fun PhotosDetailsScreen(
                     textAlign = TextAlign.Center)
 
                 ThemeSwitcher(mainViewModel = mainViewModel)
-                MoreOptionsSelector(photo = photo, downloadId)
+                MoreOptionsSelector(photo = photo, openDownloadDialog)
             }
         }
     ) {
@@ -111,17 +118,73 @@ fun PhotosDetailsScreen(
             }
         }
     }
+
+    if (openDownloadDialog.value && photo != null) {
+        DownloadConfirmationDialog(
+            photo = photo,
+            openDownloadDialog = openDownloadDialog,
+            downloadId = downloadId)
+    }
+}
+
+@Composable
+fun DownloadConfirmationDialog(
+    photo: Photo,
+    openDownloadDialog: MutableState<Boolean>,
+    downloadId: MutableLongState
+) {
+    val activity = LocalContext.current as Activity
+    val fileName = remember {
+        mutableStateOf(
+            URLUtil.guessFileName(photo.source.original, null, null)) 
+    }
+    AlertDialog(
+        onDismissRequest = {
+            openDownloadDialog.value = false
+        },
+        title = {
+            Text(text = stringResource(id = R.string.download))
+        },
+        text = {
+            Column {
+                TextField(
+                    value = fileName.value, 
+                    onValueChange = { fileName.value = it })
+                Text(text = "File Name")
+            }
+        },
+        confirmButton = {
+            Button(
+                onClick = {
+                    openDownloadDialog.value = false
+                    downloadFile(activity, photo, fileName.value, downloadId)
+                },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary),
+                enabled = !fileName.value.isNullOrBlank()) {
+                Text(text = stringResource(id = R.string.download))
+            }
+        },
+        dismissButton = {
+            Button(
+                onClick = { openDownloadDialog.value = false },
+                colors = ButtonDefaults.outlinedButtonColors()
+            ) {
+                Text(text = stringResource(id = R.string.cancel))
+            }
+        })
 }
 
 @Composable
 fun MoreOptionsSelector(
     photo: Photo?,
-    downloadId: MutableLongState) {
+    openDownloadDialog: MutableState<Boolean>) {
     if (photo == null) {
         return
     }
 
     val activity = LocalContext.current as Activity
+    var expanded by  remember { mutableStateOf(false) }
 
     val shareAction: () -> Unit = {
         val sendIntent: Intent = Intent().apply {
@@ -131,9 +194,9 @@ fun MoreOptionsSelector(
         }
         val shareIntent = Intent.createChooser(sendIntent, null)
         activity.startActivity(shareIntent)
+        expanded = false
     }
 
-    var expanded by  remember { mutableStateOf(false) }
     IconButton(onClick = { expanded = true }) {
         Icon(
             painter = painterResource(id = R.drawable.ic_vertical_menu),
@@ -147,7 +210,10 @@ fun MoreOptionsSelector(
                 onClick = shareAction)
             DropdownMenuItem(
                 text = { Text(text = stringResource(id = R.string.download)) },
-                onClick = { downloadFile(activity, photo, downloadId) })
+                onClick = {
+                    expanded = false
+                    openDownloadDialog.value = true
+                })
         }
     }
 }
@@ -177,7 +243,12 @@ fun PhotosDetailsScreenContent(
     }
 }
 
-private fun downloadFile(activity: Activity, photo: Photo, downloadId: MutableLongState) {
+private fun downloadFile(
+    activity: Activity,
+    photo: Photo,
+    fileName: String,
+    downloadId: MutableLongState
+) {
     if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q &&
         ContextCompat.checkSelfPermission(
             activity,
@@ -197,9 +268,7 @@ private fun downloadFile(activity: Activity, photo: Photo, downloadId: MutableLo
     val url = photo.source.original
     val request = DownloadManager.Request(Uri.parse(url))
         .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
-        .setDestinationInExternalPublicDir(
-            Environment.DIRECTORY_DOWNLOADS,
-            URLUtil.guessFileName(url, null, null))
+        .setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, fileName)
 
     val downloadManager = activity.getSystemService(DOWNLOAD_SERVICE) as DownloadManager
     val newDownloadId = downloadManager.enqueue(request)
