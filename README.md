@@ -1,5 +1,7 @@
 # Photo Viewer
 
+<img src="app_screenshot.png" width="350"/>
+
 A simple Android application that shows photos from Pexels. 
 
 ## Gallery Screen
