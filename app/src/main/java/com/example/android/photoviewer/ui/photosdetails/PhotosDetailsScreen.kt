@@ -24,7 +24,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -38,7 +37,6 @@ import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableLongState
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -58,6 +56,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.example.android.photoviewer.R
 import com.example.android.photoviewer.data.model.Photo
+import com.example.android.photoviewer.ui.common.ErrorMessage
 import com.example.android.photoviewer.ui.common.SystemBroadcastReceiver
 import com.example.android.photoviewer.ui.main.MainViewModel
 import com.example.android.photoviewer.ui.common.ThemeSwitcher
@@ -223,9 +222,15 @@ fun PhotosDetailsScreenContent(
     photo: Photo?,
     paddingValues: PaddingValues,
 ) {
-    Column(modifier = Modifier.padding(paddingValues)) {
+    Column(
+        modifier = Modifier.padding(paddingValues),
+    ) {
         if (photo == null) {
-            Text("Photo not found")
+            ErrorMessage(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(20.dp),
+                message = stringResource(id = R.string.photo_not_found))
             return
         }
 

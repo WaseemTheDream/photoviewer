@@ -56,6 +56,7 @@ import com.example.android.photoviewer.ui.model.DisplayStyle
 fun PhotosListScreen(
     mainViewModel: MainViewModel,
     viewModel: PhotosListViewModel = hiltViewModel(),
+    openNavigationDrawer: () -> Unit,
     navigateToDetailsScreen: (photoId: String) -> Unit
 ) {
 
@@ -68,7 +69,7 @@ fun PhotosListScreen(
                     .background(MaterialTheme.colorScheme.primary),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                IconButton(onClick = { /*TODO*/ }) {
+                IconButton(onClick = openNavigationDrawer) {
                     Icon(
                         Icons.Default.Menu,
                         contentDescription = null,
@@ -165,8 +166,8 @@ fun PhotosGridScreenContent(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(20.dp),
-            message = errorMessage,
-            onClickRetry = { photoPagingItems.retry() })
+            message = errorMessage
+        ) { photoPagingItems.retry() }
         return
     }
 
@@ -195,8 +196,8 @@ fun PhotosGridScreenContent(
                             stringResource(id = R.string.unknown_error)
                         ErrorMessage(
                             modifier = Modifier.padding(20.dp),
-                            message = errorMessage,
-                            onClickRetry = { retry() })
+                            message = errorMessage
+                        ) { retry() }
                     }
                 }
             }
@@ -236,8 +237,8 @@ fun PhotosCardListScreenContent(
                             modifier = Modifier
                                 .fillParentMaxSize()
                                 .padding(20.dp),
-                            message = errorMessage,
-                            onClickRetry = { retry() })
+                            message = errorMessage
+                        ) { retry() }
                     }
                 }
 
@@ -253,8 +254,8 @@ fun PhotosCardListScreenContent(
                             stringResource(id = R.string.unknown_error)
                         ErrorMessage(
                             modifier = Modifier.padding(20.dp),
-                            message = errorMessage,
-                            onClickRetry = { retry() })
+                            message = errorMessage
+                        ) { retry() }
                     }
                 }
             }

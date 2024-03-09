@@ -14,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.android.photoviewer.R
@@ -39,20 +40,23 @@ fun PageLoader(modifier: Modifier = Modifier) {
 fun ErrorMessage(
     message: String,
     modifier: Modifier = Modifier,
-    onClickRetry: () -> Unit
+    onClickRetry: (() -> Unit)? = null,
 ) {
     Row(
         modifier = modifier.padding(10.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
+        horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
             text = message,
+            textAlign = TextAlign.Center,
             color = MaterialTheme.colorScheme.error,
             modifier = Modifier.weight(1f),
             maxLines = 2)
-        OutlinedButton(onClick = onClickRetry) { 
-            Text(text = stringResource(id = R.string.retry))
+        if (onClickRetry != null) {
+            OutlinedButton(onClick = onClickRetry) {
+                Text(text = stringResource(id = R.string.retry))
+            }
         }
     }
 }

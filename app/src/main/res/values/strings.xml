@@ -15,4 +15,6 @@
     <string name="download_started">Downloading file…</string>
     <string name="download_completed">Download Completed.</string>
     <string name="cancel">Cancel</string>
+    <string name="home">Home</string>
+    <string name="photo_not_found">Photo not found</string>
 </resources>
