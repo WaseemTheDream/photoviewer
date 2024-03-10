@@ -1,18 +1,49 @@
 package com.example.android.photoviewer.ui.common
 
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.android.photoviewer.R
 import com.example.android.photoviewer.ui.main.MainViewModel
 import com.example.android.photoviewer.ui.theme.AppTheme
+
+
+@Composable
+fun AppMenuButton(
+    openNavigationDrawer: () -> Unit
+) {
+    IconButton(onClick = openNavigationDrawer) {
+        Icon(
+            imageVector = Icons.Default.Menu,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.onPrimary,
+            modifier = Modifier.size(25.dp))
+    }
+}
+
+@Composable
+fun AppBarTitle(
+    text: String,
+    modifier: Modifier = Modifier
+) {
+    Text(
+        text = text,
+        color = MaterialTheme.colorScheme.onPrimary,
+        modifier = modifier.padding(16.dp),
+        textAlign = TextAlign.Center)
+}
 
 @Composable
 fun ThemeSwitcher(mainViewModel: MainViewModel) {

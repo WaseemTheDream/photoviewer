@@ -43,6 +43,8 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.android.photoviewer.R
 import com.example.android.photoviewer.data.model.Photo
+import com.example.android.photoviewer.ui.common.AppBarTitle
+import com.example.android.photoviewer.ui.common.AppMenuButton
 import com.example.android.photoviewer.ui.common.ErrorMessage
 import com.example.android.photoviewer.ui.common.LoadingNextPageItem
 import com.example.android.photoviewer.ui.common.PageLoader
@@ -69,22 +71,11 @@ fun PhotosListScreen(
                     .background(MaterialTheme.colorScheme.primary),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                IconButton(onClick = openNavigationDrawer) {
-                    Icon(
-                        Icons.Default.Menu,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onPrimary,
-                        modifier = Modifier.size(25.dp)
-                    )
-                }
+                AppMenuButton(openNavigationDrawer)
 
-                Text(
+                AppBarTitle(
                     text = stringResource(id = R.string.app_name),
-                    color = MaterialTheme.colorScheme.onPrimary,
-                    modifier = Modifier
-                        .padding(vertical = 16.dp, horizontal = 16.dp)
-                        .weight(1.0f),
-                    textAlign = TextAlign.Center)
+                    modifier = Modifier.weight(1f))
 
                 ThemeSwitcher(mainViewModel = mainViewModel)
                 DisplayStyleSelector(viewModel) {
