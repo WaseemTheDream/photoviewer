@@ -1,6 +1,5 @@
 package com.example.android.photoviewer.data.repository
 
-import android.util.Log
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.example.android.photoviewer.core.app.Constants
@@ -44,7 +43,7 @@ class PhotoPagingSource(
             val photosResponse = response.body()
                 ?: return LoadResult.Error(HttpException(response))
 
-            photosResponse.photos.forEach { localDataSource.putPhoto(it) }
+            photosResponse.photos.forEach { localDataSource.cachePhoto(it) }
 
             LoadResult.Page(
                 data = photosResponse.photos,

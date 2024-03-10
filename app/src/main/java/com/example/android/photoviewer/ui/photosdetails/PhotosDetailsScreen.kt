@@ -35,8 +35,10 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableLongState
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -71,7 +73,13 @@ fun PhotosDetailsScreen(
     navigateBack: () -> Unit,
     viewModel: PhotosDetailsViewModel = hiltViewModel(),
 ) {
-    val photo: Photo? = photoId?.let { viewModel.getPhoto(it) }
+    LaunchedEffect(key1 = photoId) {
+        if (photoId != null) {
+            viewModel.getPhoto(photoId)
+        }
+    }
+
+    val photo: Photo? by viewModel.photo.collectAsState()
     val downloadId = remember { mutableLongStateOf(-1) }
     val openDownloadDialog = remember { mutableStateOf(false) }
     Scaffold(
@@ -120,7 +128,7 @@ fun PhotosDetailsScreen(
 
     if (openDownloadDialog.value && photo != null) {
         DownloadConfirmationDialog(
-            photo = photo,
+            photo = photo!!,
             openDownloadDialog = openDownloadDialog,
             downloadId = downloadId)
     }

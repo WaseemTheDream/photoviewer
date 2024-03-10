@@ -1,6 +1,7 @@
 package com.example.android.photoviewer.core.di
 
 import com.example.android.photoviewer.core.network.PhotoApi
+import com.example.android.photoviewer.data.local.PhotoDao
 import com.example.android.photoviewer.data.local.PhotoLocalDataSource
 import com.example.android.photoviewer.data.local.PhotoLocalDataSourceImpl
 import com.example.android.photoviewer.data.remote.PhotoRemoteDataSource
@@ -25,7 +26,9 @@ object AppModule {
 
     @Singleton
     @Provides
-    fun providePhotoLocalDataSource(): PhotoLocalDataSource = PhotoLocalDataSourceImpl()
+    fun providePhotoLocalDataSource(
+        photoDao: PhotoDao
+    ): PhotoLocalDataSource = PhotoLocalDataSourceImpl(photoDao)
 
     @Singleton
     @Provides
