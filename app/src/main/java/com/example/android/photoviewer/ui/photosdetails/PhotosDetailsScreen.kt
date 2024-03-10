@@ -109,7 +109,7 @@ fun PhotosDetailsScreen(
                     textAlign = TextAlign.Center)
 
                 ThemeSwitcher(mainViewModel = mainViewModel)
-                MoreOptionsSelector(photo = photo, openDownloadDialog)
+                MoreOptionsSelector(viewModel = viewModel, photo = photo, openDownloadDialog)
             }
         }
     ) {
@@ -184,8 +184,10 @@ fun DownloadConfirmationDialog(
 
 @Composable
 fun MoreOptionsSelector(
+    viewModel: PhotosDetailsViewModel,
     photo: Photo?,
-    openDownloadDialog: MutableState<Boolean>) {
+    openDownloadDialog: MutableState<Boolean>
+) {
     if (photo == null) {
         return
     }
@@ -204,6 +206,8 @@ fun MoreOptionsSelector(
         expanded = false
     }
 
+    val isSaved by viewModel.isSaved.collectAsState()
+
     IconButton(onClick = { expanded = true }) {
         Icon(
             painter = painterResource(id = R.drawable.ic_vertical_menu),
@@ -220,6 +224,19 @@ fun MoreOptionsSelector(
                 onClick = {
                     expanded = false
                     openDownloadDialog.value = true
+                })
+            DropdownMenuItem(
+                text = {
+                    val saveTextRes = if (isSaved) R.string.unsave else R.string.save
+                    Text(text = stringResource(id = saveTextRes))
+                },
+                onClick = {
+                    if (isSaved) {
+                        viewModel.unSavePhoto(photo)
+                    } else {
+                        viewModel.savePhoto(photo)
+                    }
+                    expanded = false
                 })
         }
     }

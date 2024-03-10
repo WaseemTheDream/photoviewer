@@ -18,4 +18,16 @@ interface PhotoLocalDataSource {
      * Adds the specified photo into the local database.
      */
     suspend fun addPhoto(photo: Photo)
+
+
+    /**
+     * Deletes the specified photo from the local database.
+     */
+    suspend fun deletePhoto(photo: Photo)
+
+    /**
+     * Returns whether a photo with the specified id exists in the local database.
+     * Does not check whether the photo is cached.
+     */
+    suspend fun existsInDatabase(photoId: Int): Flow<Boolean>
 }

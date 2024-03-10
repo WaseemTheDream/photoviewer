@@ -15,6 +15,9 @@ interface PhotoDao {
     @Query("SELECT * FROM $PHOTOS_TABLE")
     fun getAllPhotos(): Flow<List<PhotoEntity>>
 
+    @Query("SELECT EXISTS(SELECT * FROM $PHOTOS_TABLE WHERE id=:photoId)")
+    fun exists(photoId: Int): Flow<Boolean>
+
     @Query("SELECT * FROM $PHOTOS_TABLE WHERE id=:photoId")
     fun getPhoto(photoId: Int): Flow<PhotoEntity>
 

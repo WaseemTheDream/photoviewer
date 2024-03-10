@@ -18,4 +18,6 @@
     <string name="home">Home</string>
     <string name="saved">Saved</string>
     <string name="photo_not_found">Photo not found</string>
+    <string name="save">Save</string>
+    <string name="unsave">Unsave</string>
 </resources>

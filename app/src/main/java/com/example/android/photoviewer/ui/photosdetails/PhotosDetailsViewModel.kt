@@ -19,6 +19,9 @@ class PhotosDetailsViewModel @Inject constructor(
     private val _photo: MutableStateFlow<Photo?> = MutableStateFlow(null)
     val photo: StateFlow<Photo?> = _photo
 
+    private val _isSaved: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    val isSaved: StateFlow<Boolean> = _isSaved
+
     fun getPhoto(photoId: Int) {
         viewModelScope.launch {
             photoDataSource
@@ -26,6 +29,24 @@ class PhotosDetailsViewModel @Inject constructor(
                 .collect {
                     _photo.value = it
                 }
+
+            photoDataSource
+                .existsInDatabase(photoId)
+                .collect {
+                    _isSaved.value = it
+                }
+        }
+    }
+
+    fun savePhoto(photo: Photo) {
+        viewModelScope.launch {
+            photoDataSource.addPhoto(photo)
+        }
+    }
+
+    fun unSavePhoto(photo: Photo) {
+        viewModelScope.launch {
+            photoDataSource.deletePhoto(photo)
         }
     }
 }

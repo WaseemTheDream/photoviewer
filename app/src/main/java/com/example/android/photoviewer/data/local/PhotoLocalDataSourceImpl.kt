@@ -28,4 +28,11 @@ class PhotoLocalDataSourceImpl @Inject constructor(
     override suspend fun addPhoto(photo: Photo) {
         photoDao.addPhoto(photo.toEntity())
     }
+
+    override suspend fun deletePhoto(photo: Photo) {
+        photoDao.deletePhoto(photo.toEntity())
+    }
+
+    override suspend fun existsInDatabase(photoId: Int): Flow<Boolean> =
+        photoDao.exists(photoId)
 }
