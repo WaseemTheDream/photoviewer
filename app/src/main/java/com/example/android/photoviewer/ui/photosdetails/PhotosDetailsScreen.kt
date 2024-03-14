@@ -231,12 +231,12 @@ fun MoreOptionsSelector(
                     Text(text = stringResource(id = saveTextRes))
                 },
                 onClick = {
+                    expanded = false
                     if (isSaved) {
                         viewModel.unSavePhoto(photo)
                     } else {
                         viewModel.savePhoto(photo)
                     }
-                    expanded = false
                 })
         }
     }

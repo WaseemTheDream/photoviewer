@@ -1,5 +1,6 @@
 package com.example.android.photoviewer.data.local
 
+import androidx.paging.PagingSource
 import com.example.android.photoviewer.data.converter.toDomain
 import com.example.android.photoviewer.data.converter.toEntity
 import com.example.android.photoviewer.data.model.Photo

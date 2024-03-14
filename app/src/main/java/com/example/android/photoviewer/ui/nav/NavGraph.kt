@@ -27,6 +27,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.android.photoviewer.R
 import com.example.android.photoviewer.ui.main.MainViewModel
+import com.example.android.photoviewer.ui.model.PhotosListScreenType
 import com.example.android.photoviewer.ui.photosdetails.PhotosDetailsScreen
 import com.example.android.photoviewer.ui.photoslist.PhotosListScreen
 import com.example.android.photoviewer.ui.saved.SavedPhotosListScreen
@@ -97,6 +98,7 @@ fun NavGraphBody(
         composable(route = AppScreen.HomeScreen.route) {
             PhotosListScreen(
                 mainViewModel = mainViewModel,
+                screenType = PhotosListScreenType.HOME,
                 openNavigationDrawer = openNavigationDrawer,
                 navigateToDetailsScreen = navigateToDetailsScreen)
         }
@@ -117,9 +119,11 @@ fun NavGraphBody(
         }
 
         composable(route = AppScreen.SavedScreen.route) {
-            SavedPhotosListScreen(
+            PhotosListScreen(
                 mainViewModel = mainViewModel,
-                openNavigationDrawer = openNavigationDrawer)
+                screenType = PhotosListScreenType.SAVED,
+                openNavigationDrawer = openNavigationDrawer,
+                navigateToDetailsScreen = navigateToDetailsScreen)
         }
     }
 }

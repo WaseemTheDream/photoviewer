@@ -1,5 +1,6 @@
 package com.example.android.photoviewer.data.local
 
+import androidx.paging.PagingSource
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
@@ -14,6 +15,9 @@ interface PhotoDao {
 
     @Query("SELECT * FROM $PHOTOS_TABLE")
     fun getAllPhotos(): Flow<List<PhotoEntity>>
+
+    @Query("SELECT * FROM $PHOTOS_TABLE")
+    fun getAllPhotosPagingSource(): PagingSource<Int, PhotoEntity>
 
     @Query("SELECT EXISTS(SELECT * FROM $PHOTOS_TABLE WHERE id=:photoId)")
     fun exists(photoId: Int): Flow<Boolean>

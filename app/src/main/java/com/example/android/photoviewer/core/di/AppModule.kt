@@ -1,7 +1,12 @@
 package com.example.android.photoviewer.core.di
 
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import com.example.android.photoviewer.core.app.Constants
 import com.example.android.photoviewer.core.network.PhotoApi
+import com.example.android.photoviewer.data.entity.PhotoEntity
 import com.example.android.photoviewer.data.local.PhotoDao
+import com.example.android.photoviewer.data.local.PhotoDatabase
 import com.example.android.photoviewer.data.local.PhotoLocalDataSource
 import com.example.android.photoviewer.data.local.PhotoLocalDataSourceImpl
 import com.example.android.photoviewer.data.remote.PhotoRemoteDataSource
@@ -37,5 +42,16 @@ object AppModule {
         photoLocalDataSource: PhotoLocalDataSource,
     ): PhotoRepository {
         return PhotoRepositoryImpl(photoRemoteDataSource, photoLocalDataSource)
+    }
+
+    @Singleton
+    @Provides
+    fun provideLocalPhotosPager(photoDatabase: PhotoDatabase): Pager<Int, PhotoEntity> {
+        return Pager(
+            config = PagingConfig(pageSize = Constants.MAX_PAGE_SIZE),
+            pagingSourceFactory = {
+                photoDatabase.photoDao().getAllPhotosPagingSource()
+            }
+        )
     }
 }
