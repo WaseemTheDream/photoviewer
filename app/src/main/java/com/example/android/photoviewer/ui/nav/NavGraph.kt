@@ -53,6 +53,7 @@ fun NavGraph(mainViewModel: MainViewModel) {
 
     val onItemClick: (MenuItem) -> Unit = {
         if (it.id != currentRoute) {
+            navController.popBackStack()
             navController.navigate(it.id)
         }
         coroutineScope.launch { drawerState.close() }

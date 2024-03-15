@@ -29,7 +29,9 @@ class PhotosDetailsViewModel @Inject constructor(
                 .collect {
                     _photo.value = it
                 }
+        }
 
+        viewModelScope.launch {
             photoDataSource
                 .existsInDatabase(photoId)
                 .collect {
