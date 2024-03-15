@@ -17,7 +17,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -30,7 +29,6 @@ import com.example.android.photoviewer.ui.main.MainViewModel
 import com.example.android.photoviewer.ui.model.PhotosListScreenType
 import com.example.android.photoviewer.ui.photosdetails.PhotosDetailsScreen
 import com.example.android.photoviewer.ui.photoslist.PhotosListScreen
-import com.example.android.photoviewer.ui.saved.SavedPhotosListScreen
 import kotlinx.coroutines.launch
 
 

@@ -16,7 +16,6 @@ import androidx.compose.foundation.lazy.grid.LazyGridItemSpanScope
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -51,7 +50,6 @@ import com.example.android.photoviewer.ui.model.DisplayStyle
 import com.example.android.photoviewer.ui.model.PhotosListScreenType
 
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PhotosListScreen(
     mainViewModel: MainViewModel,

@@ -19,7 +19,7 @@ class MainViewModel @Inject constructor(
     private val appSettingsRepository: AppSettingsRepository
 ) : ViewModel() {
 
-    private val _appTheme = MutableStateFlow(AppTheme.Default)
+    private val _appTheme = MutableStateFlow(AppTheme.Light)
     val appTheme: StateFlow<AppTheme> = _appTheme
 
     init {

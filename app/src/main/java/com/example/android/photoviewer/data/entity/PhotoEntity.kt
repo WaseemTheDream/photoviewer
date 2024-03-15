@@ -28,5 +28,8 @@ data class PhotoEntity(
     val description: String,
 
     @ColumnInfo("src_original")
-    val srcOriginal: String
+    val srcOriginal: String,
+
+    @ColumnInfo("src_medium")
+    val srcMedium: String
 )

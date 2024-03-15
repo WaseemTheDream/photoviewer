@@ -12,7 +12,8 @@ fun Photo.toEntity(): PhotoEntity =
         url = this.url,
         photographer = this.photographer,
         description = this.description,
-        srcOriginal = this.source.original)
+        srcOriginal = this.source.original,
+        srcMedium = this.source.medium)
 
 fun PhotoEntity.toDomain(): Photo =
     Photo(
@@ -20,6 +21,6 @@ fun PhotoEntity.toDomain(): Photo =
         width = this.width,
         height = this.height,
         url = this.url,
-        source = PhotoSource(this.srcOriginal),
+        source = PhotoSource(this.srcOriginal, this.srcMedium),
         photographer = this.photographer,
         description = this.description)

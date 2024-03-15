@@ -14,8 +14,6 @@ class PhotoRemoteDataSourceImpl @Inject constructor(
         pageNumber: Int,
         perPage: Int
     ): Response<PhotoResponse> {
-        // Add 5 second artificial delay to verify loading indicator
-        delay(5000)
         return remoteApi.getPhotos(
             token =  apiKey,
             pageNumber = pageNumber,

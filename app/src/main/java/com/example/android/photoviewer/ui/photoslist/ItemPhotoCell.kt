@@ -13,7 +13,7 @@ import com.example.android.photoviewer.data.model.Photo
 fun ItemPhotoCell(photo: Photo, photoClickListener: (Photo) -> Unit) {
     AsyncImage(
         modifier = Modifier.height(200.dp).clickable { photoClickListener(photo) },
-        model = photo.source.original,
+        model = photo.source.medium,
         contentDescription = photo.description,
         contentScale = ContentScale.Crop)
 }

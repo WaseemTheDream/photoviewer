@@ -32,7 +32,7 @@ fun ItemPhotoCard(
     ) {
         AsyncImage(
             modifier = Modifier.height(400.dp),
-            model = photo.source.original,
+            model = photo.source.medium,
             contentDescription = photo.description,
             contentScale = ContentScale.Crop)
 
