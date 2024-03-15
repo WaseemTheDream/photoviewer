@@ -64,6 +64,7 @@ fun NavGraph(mainViewModel: MainViewModel) {
     }
 
     ModalNavigationDrawer(
+        gesturesEnabled = drawerState.isOpen,
         drawerContent = {
             NavigationDrawer(
                 route = currentRoute,
@@ -71,7 +72,7 @@ fun NavGraph(mainViewModel: MainViewModel) {
                 items = menuItems,
                 onItemClick = onItemClick)
         }, 
-        drawerState = drawerState 
+        drawerState = drawerState
     ) {
         NavGraphBody(
             mainViewModel = mainViewModel,
