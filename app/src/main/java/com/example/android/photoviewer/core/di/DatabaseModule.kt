@@ -27,5 +27,9 @@ object DatabaseModule {
 
     @Singleton
     @Provides
-    fun provideDao(database: PhotoDatabase) = database.photoDao()
+    fun providePhotoDao(database: PhotoDatabase) = database.photoDao()
+
+    @Singleton
+    @Provides
+    fun providePhotoRemoteKeyDao(database: PhotoDatabase) = database.photoRemoteKeyDao()
 }
