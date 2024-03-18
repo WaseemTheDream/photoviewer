@@ -8,6 +8,7 @@ import androidx.paging.cachedIn
 import androidx.paging.map
 import com.example.android.photoviewer.data.converter.toDomain
 import com.example.android.photoviewer.data.entity.PhotoEntity
+import com.example.android.photoviewer.data.entity.SavedPhotoEntity
 import com.example.android.photoviewer.data.model.Photo
 import com.example.android.photoviewer.data.repository.AppSettingsRepository
 import com.example.android.photoviewer.data.repository.PhotoRepository
@@ -26,7 +27,7 @@ import javax.inject.Inject
 class PhotosListViewModel @Inject constructor(
     private val appSettingsRepository: AppSettingsRepository,
     private val photoRepository: PhotoRepository,
-    private val localPhotos: Pager<Int, PhotoEntity>
+    private val localPhotos: Pager<Int, SavedPhotoEntity>
 ) : ViewModel() {
 
     private val _photosState: MutableStateFlow<PagingData<Photo>> =

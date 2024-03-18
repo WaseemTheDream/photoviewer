@@ -5,6 +5,7 @@ import androidx.paging.PagingConfig
 import com.example.android.photoviewer.core.app.Constants
 import com.example.android.photoviewer.core.network.PhotoApi
 import com.example.android.photoviewer.data.entity.PhotoEntity
+import com.example.android.photoviewer.data.entity.SavedPhotoEntity
 import com.example.android.photoviewer.data.local.PhotoDao
 import com.example.android.photoviewer.data.local.PhotoDatabase
 import com.example.android.photoviewer.data.local.PhotoLocalDataSource
@@ -33,8 +34,9 @@ object AppModule {
     @Singleton
     @Provides
     fun providePhotoLocalDataSource(
-        photoDao: PhotoDao
-    ): PhotoLocalDataSource = PhotoLocalDataSourceImpl(photoDao)
+        photoDb: PhotoDatabase
+    ): PhotoLocalDataSource = PhotoLocalDataSourceImpl(
+        photoDb.photoDao(), photoDb.savedPhotoDao())
 
     @Singleton
     @Provides
@@ -47,11 +49,11 @@ object AppModule {
 
     @Singleton
     @Provides
-    fun provideLocalPhotosPager(photoDatabase: PhotoDatabase): Pager<Int, PhotoEntity> {
+    fun provideSavedPhotosPager(photoDatabase: PhotoDatabase): Pager<Int, SavedPhotoEntity> {
         return Pager(
             config = PagingConfig(pageSize = Constants.MAX_PAGE_SIZE),
             pagingSourceFactory = {
-                photoDatabase.photoDao().getAllPhotosPagingSource()
+                photoDatabase.savedPhotoDao().getAllPhotosPagingSource()
             }
         )
     }

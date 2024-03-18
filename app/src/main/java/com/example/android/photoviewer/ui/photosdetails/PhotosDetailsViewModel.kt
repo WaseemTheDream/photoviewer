@@ -5,7 +5,6 @@ import androidx.lifecycle.viewModelScope
 import com.example.android.photoviewer.data.local.PhotoLocalDataSource
 import com.example.android.photoviewer.data.model.Photo
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -33,7 +32,7 @@ class PhotosDetailsViewModel @Inject constructor(
 
         viewModelScope.launch {
             photoDataSource
-                .existsInDatabase(photoId)
+                .isSaved(photoId)
                 .collect {
                     _isSaved.value = it
                 }
@@ -42,13 +41,13 @@ class PhotosDetailsViewModel @Inject constructor(
 
     fun savePhoto(photo: Photo) {
         viewModelScope.launch {
-            photoDataSource.addPhoto(photo)
+            photoDataSource.savePhoto(photo)
         }
     }
 
     fun unSavePhoto(photo: Photo) {
         viewModelScope.launch {
-            photoDataSource.deletePhoto(photo)
+            photoDataSource.unSavePhoto(photo)
         }
     }
 }

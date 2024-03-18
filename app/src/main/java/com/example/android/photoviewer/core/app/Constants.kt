@@ -13,6 +13,7 @@ object Constants {
     const val DISPLAY_STYLE_KEY = "display_style_setting"
 
     const val PHOTOS_TABLE = "photos"
+    const val SAVED_PHOTOS_TABLE = "saved_photos"
     const val PHOTOS_REMOTE_KEYS_TABLE = "photos_remote_keys"
     const val PHOTOS_DATABASE = "photos_database"
 }
