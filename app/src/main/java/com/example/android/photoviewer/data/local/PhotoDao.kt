@@ -19,6 +19,9 @@ interface PhotoDao {
     @Query("SELECT * FROM $PHOTOS_TABLE ORDER BY last_updated_local ASC, secondary_id ASC")
     fun getAllPhotosPagingSource(): PagingSource<Int, PhotoEntity>
 
+    @Query("SELECT last_updated_local FROM $PHOTOS_TABLE ORDER BY last_updated_local ASC")
+    fun firstUpdated(): Flow<Long?>
+
     @Query("SELECT EXISTS(SELECT * FROM $PHOTOS_TABLE WHERE id=:photoId)")
     fun exists(photoId: Int): Flow<Boolean>
 

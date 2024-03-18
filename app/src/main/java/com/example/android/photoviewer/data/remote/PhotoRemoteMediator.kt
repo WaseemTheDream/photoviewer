@@ -12,6 +12,7 @@ import com.example.android.photoviewer.data.entity.PhotoRemoteKey
 import com.example.android.photoviewer.data.local.PhotoDao
 import com.example.android.photoviewer.data.local.PhotoDatabase
 import com.example.android.photoviewer.data.local.PhotoRemoteKeyDao
+import kotlinx.coroutines.flow.first
 import retrofit2.HttpException
 import javax.inject.Inject
 
@@ -23,6 +24,16 @@ class PhotoRemoteMediator @Inject constructor(
 
     private val dao: PhotoDao = photoDb.photoDao()
     private val remoteKeyDao: PhotoRemoteKeyDao = photoDb.photoRemoteKeyDao()
+
+    override suspend fun initialize(): InitializeAction {
+        val firstUpdated = dao.firstUpdated().first()
+        return if (firstUpdated == null ||
+                firstUpdated + Constants.REFRESH_TIMEOUT_MS < System.currentTimeMillis()) {
+            InitializeAction.LAUNCH_INITIAL_REFRESH
+        } else {
+            InitializeAction.SKIP_INITIAL_REFRESH
+        }
+    }
 
     override suspend fun load(loadType: LoadType, state: PagingState<Int, PhotoEntity>): MediatorResult {
         return try {
