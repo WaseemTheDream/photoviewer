@@ -177,8 +177,10 @@ fun PhotosGridScreenContent(
         columns = GridCells.Fixed(COLUMN_COUNT),
         verticalArrangement = Arrangement.spacedBy(4.dp),
         horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-        items(photoPagingItems.itemCount) {
-            index -> ItemPhotoCell(photo = photoPagingItems[index]!!, photoClickListener)
+        items(photoPagingItems.itemCount) {index ->
+            photoPagingItems.get(index)?.let {
+                ItemPhotoCell(photo = it, photoClickListener)
+            }
         }
 
         photoPagingItems.apply {
@@ -218,7 +220,9 @@ fun PhotosCardListScreenContent(
         verticalArrangement = Arrangement.spacedBy(20.dp)) {
         item { Spacer(modifier = Modifier.padding(2.dp)) }
         items(photoPagingItems.itemCount) { index ->
-            ItemPhotoCard(index = index, photo = photoPagingItems[index]!!, photoClickListener)
+            photoPagingItems.get(index)?.let {
+                ItemPhotoCard(index = index, photo = it, photoClickListener)
+            }
         }
         photoPagingItems.apply {
             when {
