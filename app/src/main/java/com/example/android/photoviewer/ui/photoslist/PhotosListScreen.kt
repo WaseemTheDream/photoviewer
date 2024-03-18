@@ -1,5 +1,6 @@
 package com.example.android.photoviewer.ui.photoslist
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
@@ -30,6 +31,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -156,12 +158,16 @@ fun PhotosGridScreenContent(
         val errorMessage =
             error.error.localizedMessage ?:
             stringResource(id = R.string.unknown_error)
-        ErrorMessage(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(20.dp),
-            message = errorMessage
-        ) { photoPagingItems.retry() }
+        if (photoPagingItems.itemCount > 0) {
+            Toast.makeText(LocalContext.current, errorMessage, Toast.LENGTH_LONG).show()
+        } else {
+            ErrorMessage(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(20.dp),
+                message = errorMessage
+            ) { photoPagingItems.retry() }
+        }
     }
 
     LazyVerticalGrid(
@@ -226,12 +232,17 @@ fun PhotosCardListScreenContent(
                         val errorMessage =
                             error.error.localizedMessage ?:
                             stringResource(id = R.string.unknown_error)
-                        ErrorMessage(
-                            modifier = Modifier
-                                .fillParentMaxSize()
-                                .padding(20.dp),
-                            message = errorMessage
-                        ) { retry() }
+
+                        if (photoPagingItems.itemCount > 0) {
+                            Toast.makeText(LocalContext.current, errorMessage, Toast.LENGTH_LONG).show()
+                        } else {
+                            ErrorMessage(
+                                modifier = Modifier
+                                    .fillParentMaxSize()
+                                    .padding(20.dp),
+                                message = errorMessage
+                            ) { retry() }
+                        }
                     }
                 }
 
