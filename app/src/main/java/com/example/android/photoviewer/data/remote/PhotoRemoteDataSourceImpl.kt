@@ -1,5 +1,6 @@
 package com.example.android.photoviewer.data.remote
 
+import android.util.Log
 import com.example.android.photoviewer.core.network.PhotoApi
 import kotlinx.coroutines.delay
 import retrofit2.Response

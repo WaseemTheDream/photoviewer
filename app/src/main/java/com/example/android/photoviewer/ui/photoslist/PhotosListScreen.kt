@@ -149,7 +149,6 @@ fun PhotosGridScreenContent(
 
     if (photoPagingItems.loadState.refresh is LoadState.Loading) {
         PageLoader(modifier = Modifier.fillMaxSize())
-        return
     }
 
     if (photoPagingItems.loadState.refresh is LoadState.Error) {
@@ -163,7 +162,6 @@ fun PhotosGridScreenContent(
                 .padding(20.dp),
             message = errorMessage
         ) { photoPagingItems.retry() }
-        return
     }
 
     LazyVerticalGrid(
@@ -174,9 +172,9 @@ fun PhotosGridScreenContent(
         verticalArrangement = Arrangement.spacedBy(4.dp),
         horizontalArrangement = Arrangement.spacedBy(4.dp)) {
         items(photoPagingItems.itemCount) {
-            index ->
-                ItemPhotoCell(photo = photoPagingItems[index]!!, photoClickListener)
+            index -> ItemPhotoCell(photo = photoPagingItems[index]!!, photoClickListener)
         }
+
         photoPagingItems.apply {
             when {
                 loadState.append is LoadState.Loading -> {

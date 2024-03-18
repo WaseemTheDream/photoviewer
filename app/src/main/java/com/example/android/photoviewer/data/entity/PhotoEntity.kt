@@ -10,7 +10,13 @@ import com.example.android.photoviewer.core.app.Constants
 data class PhotoEntity(
     @PrimaryKey(autoGenerate = false)
     @ColumnInfo(name = "id")
-    val id: Int = 0,
+    val primaryId: Int = 0,
+
+    @ColumnInfo(name = "secondary_id")
+    val secondaryId: Int = 0,
+
+    @ColumnInfo(name = "last_updated_local")
+    val lastUpdatedLocal: Long = System.currentTimeMillis(),
 
     @ColumnInfo("width")
     val width: Int,

@@ -13,17 +13,17 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface PhotoDao {
 
-    @Query("SELECT * FROM $PHOTOS_TABLE")
+    @Query("SELECT * FROM $PHOTOS_TABLE ORDER BY last_updated_local ASC, secondary_id ASC")
     fun getAllPhotos(): Flow<List<PhotoEntity>>
 
-    @Query("SELECT * FROM $PHOTOS_TABLE")
+    @Query("SELECT * FROM $PHOTOS_TABLE ORDER BY last_updated_local ASC, secondary_id ASC")
     fun getAllPhotosPagingSource(): PagingSource<Int, PhotoEntity>
 
     @Query("SELECT EXISTS(SELECT * FROM $PHOTOS_TABLE WHERE id=:photoId)")
     fun exists(photoId: Int): Flow<Boolean>
 
     @Query("SELECT * FROM $PHOTOS_TABLE WHERE id=:photoId")
-    fun getPhoto(photoId: Int): Flow<PhotoEntity>
+    fun getPhoto(photoId: Int): Flow<PhotoEntity?>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun addPhoto(photo: PhotoEntity)

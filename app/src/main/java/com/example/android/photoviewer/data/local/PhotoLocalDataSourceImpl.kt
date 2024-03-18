@@ -1,6 +1,5 @@
 package com.example.android.photoviewer.data.local
 
-import androidx.paging.PagingSource
 import com.example.android.photoviewer.data.converter.toDomain
 import com.example.android.photoviewer.data.converter.toEntity
 import com.example.android.photoviewer.data.model.Photo
@@ -18,12 +17,18 @@ class PhotoLocalDataSourceImpl @Inject constructor(
         photoStore[photo.id] = photo
     }
 
-    override suspend fun getPhoto(photoId: Int): Flow<Photo> {
+    override suspend fun getPhoto(photoId: Int): Flow<Photo?> {
         if (photoStore.containsKey(photoId)) {
             return flow { emit(photoStore[photoId]!!) }
         }
 
-        return photoDao.getPhoto(photoId).map { it.toDomain() }
+        return photoDao.getPhoto(photoId).map {
+            if (photoStore.containsKey(photoId)) {
+                photoStore[photoId]
+            } else {
+                it?.toDomain()
+            }
+        }
     }
 
     override suspend fun addPhoto(photo: Photo) {
@@ -31,6 +36,7 @@ class PhotoLocalDataSourceImpl @Inject constructor(
     }
 
     override suspend fun deletePhoto(photo: Photo) {
+        cachePhoto(photo)
         photoDao.deletePhoto(photo.toEntity())
     }
 

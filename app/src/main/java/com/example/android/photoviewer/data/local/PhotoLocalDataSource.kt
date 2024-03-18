@@ -13,7 +13,7 @@ interface PhotoLocalDataSource {
     /**
      * Fetches a photo from local memory (preferred) or database.
      */
-    suspend fun getPhoto(photoId: Int): Flow<Photo>
+    suspend fun getPhoto(photoId: Int): Flow<Photo?>
 
     /**
      * Adds the specified photo into the local database.

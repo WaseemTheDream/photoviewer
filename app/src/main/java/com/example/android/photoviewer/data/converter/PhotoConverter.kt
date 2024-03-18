@@ -4,9 +4,10 @@ import com.example.android.photoviewer.data.entity.PhotoEntity
 import com.example.android.photoviewer.data.model.Photo
 import com.example.android.photoviewer.data.model.PhotoSource
 
-fun Photo.toEntity(): PhotoEntity =
+fun Photo.toEntity(secondaryId: Int = 0): PhotoEntity =
     PhotoEntity(
-        id = this.id,
+        primaryId = this.id,
+        secondaryId = secondaryId,
         width = this.width,
         height = this.height,
         url = this.url,
@@ -17,7 +18,7 @@ fun Photo.toEntity(): PhotoEntity =
 
 fun PhotoEntity.toDomain(): Photo =
     Photo(
-        id = this.id,
+        id = this.primaryId,
         width = this.width,
         height = this.height,
         url = this.url,

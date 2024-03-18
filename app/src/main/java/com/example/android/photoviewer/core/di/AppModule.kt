@@ -11,6 +11,7 @@ import com.example.android.photoviewer.data.local.PhotoLocalDataSource
 import com.example.android.photoviewer.data.local.PhotoLocalDataSourceImpl
 import com.example.android.photoviewer.data.remote.PhotoRemoteDataSource
 import com.example.android.photoviewer.data.remote.PhotoRemoteDataSourceImpl
+import com.example.android.photoviewer.data.remote.PhotoRemoteMediator
 import com.example.android.photoviewer.data.repository.PhotoRepository
 import com.example.android.photoviewer.data.repository.PhotoRepositoryImpl
 import dagger.Module
@@ -38,10 +39,10 @@ object AppModule {
     @Singleton
     @Provides
     fun providePhotoRepository(
-        photoRemoteDataSource: PhotoRemoteDataSource,
-        photoLocalDataSource: PhotoLocalDataSource,
+        photoRemoteMediator: PhotoRemoteMediator,
+        photoDb: PhotoDatabase,
     ): PhotoRepository {
-        return PhotoRepositoryImpl(photoRemoteDataSource, photoLocalDataSource)
+        return PhotoRepositoryImpl(photoRemoteMediator, photoDb)
     }
 
     @Singleton
