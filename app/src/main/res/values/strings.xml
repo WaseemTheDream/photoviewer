@@ -20,4 +20,5 @@
     <string name="photo_not_found">Photo not found</string>
     <string name="save">Save</string>
     <string name="unsave">Unsave</string>
+    <string name="file_name">File Name</string>
 </resources>

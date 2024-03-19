@@ -159,7 +159,7 @@ fun DownloadConfirmationDialog(
                 TextField(
                     value = fileName.value, 
                     onValueChange = { fileName.value = it })
-                Text(text = "File Name")
+                Text(text = stringResource(id = R.string.file_name))
             }
         },
         confirmButton = {
