@@ -46,6 +46,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -56,6 +57,8 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
+import coil.compose.rememberAsyncImagePainter
+import coil.compose.rememberImagePainter
 import com.example.android.photoviewer.R
 import com.example.android.photoviewer.data.model.Photo
 import com.example.android.photoviewer.ui.common.ErrorMessage
@@ -262,11 +265,14 @@ fun PhotosDetailsScreenContent(
         }
 
         val zoomState = rememberZoomState()
+        val placeholderImagePainter = rememberAsyncImagePainter(model = photo.source.medium)
+
         AsyncImage(
             modifier = Modifier
                 .fillMaxSize()
                 .zoomable(zoomState = zoomState),
             model = photo.source.original,
+            placeholder = placeholderImagePainter,
             contentDescription = photo.description,
             contentScale = ContentScale.Crop,
             onSuccess = { state ->
