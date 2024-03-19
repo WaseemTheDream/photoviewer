@@ -33,7 +33,7 @@ class PhotosListViewModel @Inject constructor(
     private val _photosState: MutableStateFlow<PagingData<Photo>> =
         MutableStateFlow(value = PagingData.empty())
 
-    val photosState: MutableStateFlow<PagingData<Photo>> get() = _photosState
+    val photosState: StateFlow<PagingData<Photo>> get() = _photosState
 
     private val _displayStyleState: MutableStateFlow<DisplayStyle> =
         MutableStateFlow(DisplayStyle.Card)

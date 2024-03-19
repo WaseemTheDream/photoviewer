@@ -1,12 +1,15 @@
 package com.example.android.photoviewer.ui.photosdetails
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.android.photoviewer.data.local.PhotoLocalDataSource
 import com.example.android.photoviewer.data.model.Photo
+import com.example.android.photoviewer.ui.model.PhotosDataSource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -21,13 +24,28 @@ class PhotosDetailsViewModel @Inject constructor(
     private val _isSaved: MutableStateFlow<Boolean> = MutableStateFlow(false)
     val isSaved: StateFlow<Boolean> = _isSaved
 
-    fun getPhoto(photoId: Int) {
-        viewModelScope.launch {
-            photoDataSource
-                .getPhoto(photoId)
-                .collect {
-                    _photo.value = it
+    fun getPhoto(dataSource: PhotosDataSource, photoId: Int) {
+        when (dataSource) {
+            PhotosDataSource.HOME -> {
+                viewModelScope.launch {
+                    photoDataSource
+                        .getPhoto(photoId)
+                        .filterNotNull()
+                        .collect {
+                            _photo.value = it
+                        }
                 }
+            }
+            PhotosDataSource.SAVED -> {
+                viewModelScope.launch {
+                    photoDataSource
+                        .getSavedPhoto(photoId)
+                        .filterNotNull()
+                        .collect {
+                            _photo.value = it
+                        }
+                }
+            }
         }
 
         viewModelScope.launch {

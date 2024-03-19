@@ -3,11 +3,8 @@ package com.example.android.photoviewer.ui.nav
 import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ModalNavigationDrawer
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -26,7 +23,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.android.photoviewer.R
 import com.example.android.photoviewer.ui.main.MainViewModel
-import com.example.android.photoviewer.ui.model.PhotosListScreenType
+import com.example.android.photoviewer.ui.model.PhotosDataSource
 import com.example.android.photoviewer.ui.photosdetails.PhotosDetailsScreen
 import com.example.android.photoviewer.ui.photoslist.PhotosListScreen
 import kotlinx.coroutines.launch
@@ -91,14 +88,14 @@ fun NavGraphBody(
         navController = navController,
         startDestination = AppScreen.HomeScreen.route) {
 
-        val navigateToDetailsScreen: (String) -> Unit = {
-            navController.navigate(AppScreenName.detailsScreen(it))
+        val navigateToDetailsScreen: (PhotosDataSource, String) -> Unit = { dataSource, photoId ->
+            navController.navigate(AppScreenName.detailsScreen(dataSource, photoId))
         }
 
         composable(route = AppScreen.HomeScreen.route) {
             PhotosListScreen(
                 mainViewModel = mainViewModel,
-                screenType = PhotosListScreenType.HOME,
+                dataSource = PhotosDataSource.HOME,
                 openNavigationDrawer = openNavigationDrawer,
                 navigateToDetailsScreen = navigateToDetailsScreen)
         }
@@ -109,19 +106,26 @@ fun NavGraphBody(
         
         composable(
             route = AppScreen.DetailsScreen.route,
-            arguments = listOf(navArgument(AppScreenParams.PHOTO) { type = NavType.IntType })
+            arguments = listOf(
+                navArgument(AppScreenParams.PHOTO) { type = NavType.IntType },
+                navArgument(AppScreenParams.PHOTO_DATA_SOURCE) { type = NavType.StringType }
+            )
         ) {
             val photoId = it.arguments?.getInt(AppScreenParams.PHOTO)
+            val dataSource = it.arguments?.getString(AppScreenParams.PHOTO_DATA_SOURCE)
+                ?.let { source -> PhotosDataSource.valueOf(source) }
+                ?: throw IllegalArgumentException("Missing required data source argument")
             PhotosDetailsScreen(
-                mainViewModel,
+                mainViewModel = mainViewModel,
                 photoId = photoId,
-                navigateBack)
+                dataSource = dataSource,
+                navigateBack = navigateBack)
         }
 
         composable(route = AppScreen.SavedScreen.route) {
             PhotosListScreen(
                 mainViewModel = mainViewModel,
-                screenType = PhotosListScreenType.SAVED,
+                dataSource = PhotosDataSource.SAVED,
                 openNavigationDrawer = openNavigationDrawer,
                 navigateToDetailsScreen = navigateToDetailsScreen)
         }

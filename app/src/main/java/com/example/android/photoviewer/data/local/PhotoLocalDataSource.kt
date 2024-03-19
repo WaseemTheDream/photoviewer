@@ -5,9 +5,14 @@ import kotlinx.coroutines.flow.Flow
 
 interface PhotoLocalDataSource {
     /**
-     * Fetches a photo from the local database.
+     * Fetches a photo from the cached photos table.
      */
     suspend fun getPhoto(photoId: Int): Flow<Photo?>
+
+    /**
+     * Fetches a photo from the saved photos table.
+     */
+    suspend fun getSavedPhoto(photoId: Int): Flow<Photo?>
 
     /**
      * Adds the specified photo into the saved photos table.

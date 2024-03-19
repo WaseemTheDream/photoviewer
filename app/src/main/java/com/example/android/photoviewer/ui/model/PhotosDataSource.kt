@@ -1,6 +1,6 @@
 package com.example.android.photoviewer.ui.model
 
-enum class PhotosListScreenType {
+enum class PhotosDataSource {
     HOME,
     SAVED
 }

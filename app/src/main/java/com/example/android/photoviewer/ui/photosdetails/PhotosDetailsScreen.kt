@@ -62,6 +62,7 @@ import com.example.android.photoviewer.ui.common.ErrorMessage
 import com.example.android.photoviewer.ui.common.SystemBroadcastReceiver
 import com.example.android.photoviewer.ui.main.MainViewModel
 import com.example.android.photoviewer.ui.common.ThemeSwitcher
+import com.example.android.photoviewer.ui.model.PhotosDataSource
 import net.engawapg.lib.zoomable.rememberZoomState
 import net.engawapg.lib.zoomable.zoomable
 
@@ -69,13 +70,14 @@ import net.engawapg.lib.zoomable.zoomable
 @Composable
 fun PhotosDetailsScreen(
     mainViewModel: MainViewModel,
+    dataSource: PhotosDataSource,
     photoId: Int?,
     navigateBack: () -> Unit,
     viewModel: PhotosDetailsViewModel = hiltViewModel(),
 ) {
-    LaunchedEffect(key1 = photoId) {
+    LaunchedEffect(photoId, dataSource) {
         if (photoId != null) {
-            viewModel.getPhoto(photoId)
+            viewModel.getPhoto(dataSource, photoId)
         }
     }
 

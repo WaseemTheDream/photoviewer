@@ -16,6 +16,9 @@ class PhotoLocalDataSourceImpl @Inject constructor(
     override suspend fun getPhoto(photoId: Int): Flow<Photo?> =
         photoDao.getPhoto(photoId).map { it?.toDomain() }
 
+    override suspend fun getSavedPhoto(photoId: Int): Flow<Photo?> =
+        savedPhotoDao.getPhoto(photoId).map { it?.toDomain() }
+
     override suspend fun savePhoto(photo: Photo) {
         savedPhotoDao.addPhoto(photo.toSavedEntity())
     }

@@ -49,22 +49,22 @@ import com.example.android.photoviewer.ui.common.PageLoader
 import com.example.android.photoviewer.ui.common.ThemeSwitcher
 import com.example.android.photoviewer.ui.main.MainViewModel
 import com.example.android.photoviewer.ui.model.DisplayStyle
-import com.example.android.photoviewer.ui.model.PhotosListScreenType
+import com.example.android.photoviewer.ui.model.PhotosDataSource
 
 
 @Composable
 fun PhotosListScreen(
     mainViewModel: MainViewModel,
     viewModel: PhotosListViewModel = hiltViewModel(),
-    screenType: PhotosListScreenType,
+    dataSource: PhotosDataSource,
     openNavigationDrawer: () -> Unit,
-    navigateToDetailsScreen: (photoId: String) -> Unit
+    navigateToDetailsScreen: (dataSource: PhotosDataSource, photoId: String) -> Unit
 ) {
 
     LaunchedEffect(Unit) {
-        when (screenType) {
-            PhotosListScreenType.HOME -> viewModel.getRemotePhotos()
-            PhotosListScreenType.SAVED -> viewModel.getSavedPhotos()
+        when (dataSource) {
+            PhotosDataSource.HOME -> viewModel.getRemotePhotos()
+            PhotosDataSource.SAVED -> viewModel.getSavedPhotos()
         }
     }
 
@@ -93,7 +93,7 @@ fun PhotosListScreen(
         val selectedStyle by viewModel.displayStyleState.collectAsState()
 
         val clickListener: (Photo) -> Unit = { photo ->
-            navigateToDetailsScreen(photo.id.toString())
+            navigateToDetailsScreen(dataSource, photo.id.toString())
         }
 
         when (selectedStyle) {
