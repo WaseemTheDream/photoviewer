@@ -1,6 +1,5 @@
 package com.example.android.photoviewer.ui.photoslist
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -10,9 +9,9 @@ import coil.compose.AsyncImage
 import com.example.android.photoviewer.data.model.Photo
 
 @Composable
-fun ItemPhotoCell(photo: Photo, photoClickListener: (Photo) -> Unit) {
+fun ItemPhotoCell(photo: Photo, modifier: Modifier = Modifier) {
     AsyncImage(
-        modifier = Modifier.height(200.dp).clickable { photoClickListener(photo) },
+        modifier = modifier.height(200.dp),
         model = photo.source.medium,
         contentDescription = photo.description,
         contentScale = ContentScale.Crop)

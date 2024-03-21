@@ -34,6 +34,9 @@ interface SavedPhotoDao {
     suspend fun addPhotos(photos: List<SavedPhotoEntity>)
 
     @Delete
+    suspend fun removePhotos(photos: List<SavedPhotoEntity>)
+
+    @Delete
     suspend fun deletePhoto(photo: SavedPhotoEntity)
 
     @Query("DELETE FROM $SAVED_PHOTOS_TABLE")

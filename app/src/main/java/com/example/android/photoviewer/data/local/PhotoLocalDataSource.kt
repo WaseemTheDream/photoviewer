@@ -19,11 +19,21 @@ interface PhotoLocalDataSource {
      */
     suspend fun savePhoto(photo: Photo)
 
+    /**
+     * Adds the specified photos into the saved photos table.
+     */
+    suspend fun savePhotos(photos: List<Photo>)
+
 
     /**
      * Deletes the specified photo from the saved photos table.
      */
     suspend fun unSavePhoto(photo: Photo)
+
+    /**
+     * Deletes the specified photos from the saved photos table.
+     */
+    suspend fun unSavePhotos(photos: List<Photo>)
 
     /**
      * Returns whether a photo with the specified id exists in the saved table.

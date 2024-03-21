@@ -1,10 +1,13 @@
 package com.example.android.photoviewer.ui.photoslist
 
 import android.widget.Toast
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -15,6 +18,10 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyGridItemSpanScope
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -33,6 +40,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -41,14 +49,16 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.android.photoviewer.R
 import com.example.android.photoviewer.data.model.Photo
-import com.example.android.photoviewer.ui.common.AppBarTitle
+import com.example.android.photoviewer.ui.common.TitleBarText
 import com.example.android.photoviewer.ui.common.AppMenuButton
 import com.example.android.photoviewer.ui.common.ErrorMessage
 import com.example.android.photoviewer.ui.common.LoadingNextPageItem
 import com.example.android.photoviewer.ui.common.PageLoader
 import com.example.android.photoviewer.ui.common.ThemeSwitcher
+import com.example.android.photoviewer.ui.common.TitleBarButton
 import com.example.android.photoviewer.ui.main.MainViewModel
 import com.example.android.photoviewer.ui.model.DisplayStyle
+import com.example.android.photoviewer.ui.model.PhotoSelectionStatus
 import com.example.android.photoviewer.ui.model.PhotosDataSource
 
 
@@ -77,15 +87,11 @@ fun PhotosListScreen(
                     .background(MaterialTheme.colorScheme.primary),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                AppMenuButton(openNavigationDrawer)
-
-                AppBarTitle(
-                    text = stringResource(id = R.string.app_name),
-                    modifier = Modifier.weight(1f))
-
-                ThemeSwitcher(mainViewModel = mainViewModel)
-                DisplayStyleSelector(viewModel) {
-                    newStyle -> viewModel.updateDisplayStyle(newStyle)
+                val selectionStatus = viewModel.selectedPhotosStatus.collectAsState()
+                if (selectionStatus.value != PhotoSelectionStatus.NONE) {
+                    SelectionTopBar(viewModel)
+                } else {
+                    DefaultTopBar(mainViewModel, viewModel, openNavigationDrawer)
                 }
             }
         }
@@ -101,6 +107,54 @@ fun PhotosListScreen(
             DisplayStyle.Grid -> PhotosGridScreenContent(it, viewModel, clickListener)
         }
     }
+}
+
+@Composable
+fun RowScope.DefaultTopBar(
+    mainViewModel: MainViewModel,
+    viewModel: PhotosListViewModel,
+    openNavigationDrawer: () -> Unit
+) {
+    AppMenuButton(openNavigationDrawer)
+
+    TitleBarText(
+        text = stringResource(id = R.string.app_name),
+        modifier = Modifier.weight(1f))
+
+    ThemeSwitcher(mainViewModel = mainViewModel)
+    DisplayStyleSelector(viewModel) { viewModel.updateDisplayStyle(it) }
+}
+
+@Composable
+fun RowScope.SelectionTopBar(
+    viewModel: PhotosListViewModel,
+) {
+    val selectedPhotos = viewModel.selectedPhotos.collectAsState()
+
+    TitleBarButton(
+        imageVector = Icons.Default.Clear,
+        onClick = { viewModel.clearSelection() })
+
+    TitleBarText(
+        text = pluralStringResource(
+            id = R.plurals.num_selected_photos,
+            count = selectedPhotos.value.size,
+            selectedPhotos.value.size),
+        modifier = Modifier.weight(1f))
+
+    val selectionStatus = viewModel.selectedPhotosStatus.collectAsState()
+    val actionIcon = when (selectionStatus.value) {
+        PhotoSelectionStatus.ALL_SAVED -> Icons.Default.Delete
+        else -> Icons.Default.Add
+    }
+    TitleBarButton(
+        imageVector = actionIcon,
+        onClick = {
+            when (selectionStatus.value) {
+                PhotoSelectionStatus.ALL_SAVED -> viewModel.unSaveSelectedPhotos()
+                else -> viewModel.saveSelectedPhotos()
+            }
+        })
 }
 
 @Composable
@@ -142,6 +196,7 @@ fun DisplayStyleDropdownMenuItemTrailingIcon(styleItem: DisplayStyle, selectedSt
 private const val COLUMN_COUNT = 3
 private val span: (LazyGridItemSpanScope) -> GridItemSpan = { GridItemSpan(COLUMN_COUNT) }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun PhotosGridScreenContent(
     paddingValues: PaddingValues,
@@ -179,7 +234,37 @@ fun PhotosGridScreenContent(
         horizontalArrangement = Arrangement.spacedBy(4.dp)) {
         items(photoPagingItems.itemCount) {index ->
             photoPagingItems.get(index)?.let {
-                ItemPhotoCell(photo = it, photoClickListener)
+                val selectedItems by viewModel.selectedPhotos.collectAsState()
+                val isSelected = selectedItems.contains(it)
+                val isInSelectionMode = viewModel.selectedPhotos.value.isNotEmpty()
+                ItemPhotoCell(
+                    photo = it,
+                    modifier = Modifier
+                        .combinedClickable(
+                            onClick = {
+                                if (isInSelectionMode) {
+                                    if (isSelected) {
+                                        viewModel.unselectPhoto(it)
+                                    } else {
+                                        viewModel.selectPhoto(it)
+                                    }
+                                } else {
+                                    photoClickListener(it)
+                                }
+                            },
+                            onLongClick = {
+                                if (isInSelectionMode) {
+                                    if (isSelected) {
+                                        viewModel.unselectPhoto(it)
+                                    } else {
+                                        viewModel.selectPhoto(it)
+                                    }
+                                } else {
+                                    viewModel.selectPhoto(it)
+                                }
+                            }
+                        )
+                        .padding(if (isSelected) 5.dp else (0.dp)))
             }
         }
 

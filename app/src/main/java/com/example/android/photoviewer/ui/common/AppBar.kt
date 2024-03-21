@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -24,17 +25,26 @@ import com.example.android.photoviewer.ui.theme.AppTheme
 fun AppMenuButton(
     openNavigationDrawer: () -> Unit
 ) {
-    IconButton(onClick = openNavigationDrawer) {
+    TitleBarButton(imageVector = Icons.Default.Menu, onClick = openNavigationDrawer)
+}
+
+@Composable
+fun TitleBarButton(
+    imageVector: ImageVector,
+    onClick: () -> Unit,
+    contentDescription: String? = null,
+) {
+    IconButton(onClick = onClick) {
         Icon(
-            imageVector = Icons.Default.Menu,
-            contentDescription = null,
+            imageVector = imageVector,
+            contentDescription = contentDescription,
             tint = MaterialTheme.colorScheme.onPrimary,
             modifier = Modifier.size(25.dp))
     }
 }
 
 @Composable
-fun AppBarTitle(
+fun TitleBarText(
     text: String,
     modifier: Modifier = Modifier
 ) {

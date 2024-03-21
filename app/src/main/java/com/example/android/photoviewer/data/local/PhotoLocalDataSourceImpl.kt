@@ -23,8 +23,16 @@ class PhotoLocalDataSourceImpl @Inject constructor(
         savedPhotoDao.addPhoto(photo.toSavedEntity())
     }
 
+    override suspend fun savePhotos(photos: List<Photo>) {
+        savedPhotoDao.addPhotos(photos.map { it.toSavedEntity() })
+    }
+
     override suspend fun unSavePhoto(photo: Photo) {
         savedPhotoDao.deletePhoto(photo.toSavedEntity())
+    }
+
+    override suspend fun unSavePhotos(photos: List<Photo>) {
+        savedPhotoDao.removePhotos(photos.map { it.toSavedEntity() })
     }
 
     override suspend fun isSaved(photoId: Int): Flow<Boolean> =
