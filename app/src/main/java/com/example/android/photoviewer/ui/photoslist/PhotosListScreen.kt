@@ -4,7 +4,6 @@ import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -22,7 +21,6 @@ import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyGridItemSpanScope
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.DropdownMenu
@@ -42,6 +40,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -71,6 +70,7 @@ import com.example.android.photoviewer.ui.model.DisplayStyle
 import com.example.android.photoviewer.ui.model.PhotoSelectionStatus
 import com.example.android.photoviewer.ui.model.PhotosDataSource
 import com.example.android.photoviewer.ui.theme.AppTheme
+import kotlinx.coroutines.launch
 
 
 @Composable
@@ -91,16 +91,20 @@ fun PhotosListScreen(
 
     val snackbarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(Unit) {
         viewModel.snackbarEvents.collect {
-            val result = snackbarHostState.showSnackbar(
-                it.message.asString(context),
-                it.actionLabel?.asString(context),
-                duration = it.duration ?: SnackbarDuration.Short)
-            when (result) {
-                SnackbarResult.ActionPerformed -> it.onAction?.let { action -> action() }
-                SnackbarResult.Dismissed -> {}
+            coroutineScope.launch {
+                snackbarHostState.currentSnackbarData?.dismiss()
+                val result = snackbarHostState.showSnackbar(
+                    it.message.asString(context),
+                    it.actionLabel?.asString(context),
+                    duration = it.duration ?: SnackbarDuration.Short)
+                when (result) {
+                    SnackbarResult.ActionPerformed -> it.onAction?.let { action -> action() }
+                    SnackbarResult.Dismissed -> {}
+                }
             }
         }
     }
