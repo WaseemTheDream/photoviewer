@@ -22,5 +22,7 @@ data class Photo(
     val photographer: String,
 
     @SerializedName("alt")
-    val description: String)
+    val description: String,
+
+    var lastUpdatedLocal: Long = System.currentTimeMillis())
 

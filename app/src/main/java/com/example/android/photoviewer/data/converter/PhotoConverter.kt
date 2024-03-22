@@ -15,7 +15,8 @@ fun Photo.toEntity(secondaryId: Int = 0): PhotoEntity =
         photographer = this.photographer,
         description = this.description,
         srcOriginal = this.source.original,
-        srcMedium = this.source.medium)
+        srcMedium = this.source.medium,
+        lastUpdatedLocal = this.lastUpdatedLocal)
 
 fun Photo.toSavedEntity(): SavedPhotoEntity =
     SavedPhotoEntity(
@@ -26,7 +27,8 @@ fun Photo.toSavedEntity(): SavedPhotoEntity =
         photographer = this.photographer,
         description = this.description,
         srcOriginal = this.source.original,
-        srcMedium = this.source.medium)
+        srcMedium = this.source.medium,
+        lastUpdatedLocal = this.lastUpdatedLocal)
 
 fun PhotoEntity.toDomain(): Photo =
     Photo(
@@ -36,7 +38,8 @@ fun PhotoEntity.toDomain(): Photo =
         url = this.url,
         source = PhotoSource(this.srcOriginal, this.srcMedium),
         photographer = this.photographer,
-        description = this.description)
+        description = this.description,
+        lastUpdatedLocal = this.lastUpdatedLocal)
 
 fun SavedPhotoEntity.toDomain(): Photo =
     Photo(
@@ -46,4 +49,5 @@ fun SavedPhotoEntity.toDomain(): Photo =
         url = this.url,
         source = PhotoSource(this.srcOriginal, this.srcMedium),
         photographer = this.photographer,
-        description = this.description)
+        description = this.description,
+        lastUpdatedLocal = this.lastUpdatedLocal)
