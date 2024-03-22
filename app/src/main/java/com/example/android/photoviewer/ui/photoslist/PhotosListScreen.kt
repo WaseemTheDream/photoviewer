@@ -28,6 +28,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -80,6 +84,22 @@ fun PhotosListScreen(
         }
     }
 
+    val snackbarHostState = remember { SnackbarHostState() }
+    val context = LocalContext.current
+
+    LaunchedEffect(Unit) {
+        viewModel.snackbarEvents.collect {
+            val result = snackbarHostState.showSnackbar(
+                it.message.asString(context),
+                it.actionLabel?.asString(context),
+                duration = it.duration ?: SnackbarDuration.Short)
+            when (result) {
+                SnackbarResult.ActionPerformed -> it.onAction?.let { action -> action() }
+                SnackbarResult.Dismissed -> {}
+            }
+        }
+    }
+
     Scaffold(
         topBar = {
             Row(
@@ -98,7 +118,8 @@ fun PhotosListScreen(
                         SelectionTopBar(viewModel)
                 }
             }
-        }
+        },
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
     ) {
         val selectedStyle by viewModel.displayStyleState.collectAsState()
 

@@ -21,9 +21,20 @@
     <string name="save">Save</string>
     <string name="unsave">Unsave</string>
     <string name="file_name">File Name</string>
+    <string name="undo">Undo</string>
 
     <plurals name="num_selected_photos">
         <item quantity="one">%d photo selected.</item>
         <item quantity="other">%d photos selected.</item>
+    </plurals>
+
+    <plurals name="num_photos_saved">
+        <item quantity="one">Photo saved.</item>
+        <item quantity="other">%d photos saved.</item>
+    </plurals>
+
+    <plurals name="num_photos_unsaved">
+        <item quantity="one">Photo unsaved.</item>
+        <item quantity="other">%d photos unsaved.</item>
     </plurals>
 </resources>

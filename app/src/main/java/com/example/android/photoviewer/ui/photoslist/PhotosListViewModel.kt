@@ -1,11 +1,13 @@
 package com.example.android.photoviewer.ui.photoslist
 
+import androidx.compose.material3.SnackbarDuration
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import androidx.paging.map
+import com.example.android.photoviewer.R
 import com.example.android.photoviewer.data.converter.toDomain
 import com.example.android.photoviewer.data.entity.SavedPhotoEntity
 import com.example.android.photoviewer.data.local.PhotoLocalDataSource
@@ -14,13 +16,18 @@ import com.example.android.photoviewer.data.repository.AppSettingsRepository
 import com.example.android.photoviewer.data.repository.PhotoRepository
 import com.example.android.photoviewer.ui.model.DisplayStyle
 import com.example.android.photoviewer.ui.model.PhotoSelectionStatus
+import com.example.android.photoviewer.ui.model.SnackbarEvent
+import com.example.android.photoviewer.ui.model.UiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -49,6 +56,9 @@ class PhotosListViewModel @Inject constructor(
 
     private val _selectedPhotos: MutableStateFlow<List<Photo>> = MutableStateFlow(emptyList())
     val selectedPhotos: StateFlow<List<Photo>> = _selectedPhotos
+
+    private val snackbarEventsChannel = Channel<SnackbarEvent>()
+    val snackbarEvents: Flow<SnackbarEvent> = snackbarEventsChannel.receiveAsFlow()
 
     init {
         readDisplayStyle()
@@ -79,6 +89,7 @@ class PhotosListViewModel @Inject constructor(
 
         viewModelScope.launch {
             isCollectingData = true
+
             localPhotos.flow
                 .distinctUntilChanged()
                 .cachedIn(viewModelScope)
@@ -101,15 +112,47 @@ class PhotosListViewModel @Inject constructor(
 
     fun saveSelectedPhotos() {
         viewModelScope.launch {
-            localPhotosDataSource.savePhotos(selectedPhotos.value)
-            calculateSelectedPhotosStatus(selectedPhotos.value)
+            val photos = selectedPhotos.value
+            localPhotosDataSource.savePhotos(photos)
+            calculateSelectedPhotosStatus(photos)
+            val count = photos.size
+            snackbarEventsChannel.send(
+                SnackbarEvent(
+                    message = UiText.PluralStringResource(
+                        R.plurals.num_photos_saved,
+                        count,
+                        count),
+                    actionLabel = UiText.StringResource(R.string.undo),
+                    duration = SnackbarDuration.Long,
+                    onAction = {
+                        viewModelScope.launch {
+                            localPhotosDataSource.unSavePhotos(photos)
+                        }
+                    })
+            )
         }
     }
 
     fun unSaveSelectedPhotos() {
         viewModelScope.launch {
-            localPhotosDataSource.unSavePhotos(selectedPhotos.value)
-            calculateSelectedPhotosStatus(selectedPhotos.value)
+            val photos = selectedPhotos.value
+            localPhotosDataSource.unSavePhotos(photos)
+            calculateSelectedPhotosStatus(photos)
+            val count = photos.size
+            snackbarEventsChannel.send(
+                SnackbarEvent(
+                    message = UiText.PluralStringResource(
+                        R.plurals.num_photos_unsaved,
+                        count,
+                        count),
+                    actionLabel = UiText.StringResource(R.string.undo),
+                    duration = SnackbarDuration.Long,
+                    onAction = {
+                        viewModelScope.launch {
+                            localPhotosDataSource.savePhotos(photos)
+                        }
+                    })
+            )
         }
     }
 
