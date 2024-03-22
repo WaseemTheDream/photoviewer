@@ -63,6 +63,7 @@ import com.example.android.photoviewer.ui.common.AppMenuButton
 import com.example.android.photoviewer.ui.common.ErrorMessage
 import com.example.android.photoviewer.ui.common.LoadingNextPageItem
 import com.example.android.photoviewer.ui.common.PageLoader
+import com.example.android.photoviewer.ui.common.SnackbarEventsReceiver
 import com.example.android.photoviewer.ui.common.ThemeSwitcher
 import com.example.android.photoviewer.ui.common.TitleBarButton
 import com.example.android.photoviewer.ui.main.MainViewModel
@@ -70,7 +71,6 @@ import com.example.android.photoviewer.ui.model.DisplayStyle
 import com.example.android.photoviewer.ui.model.PhotoSelectionStatus
 import com.example.android.photoviewer.ui.model.PhotosDataSource
 import com.example.android.photoviewer.ui.theme.AppTheme
-import kotlinx.coroutines.launch
 
 
 @Composable
@@ -90,24 +90,9 @@ fun PhotosListScreen(
     }
 
     val snackbarHostState = remember { SnackbarHostState() }
-    val context = LocalContext.current
-    val coroutineScope = rememberCoroutineScope()
-
-    LaunchedEffect(Unit) {
-        viewModel.snackbarEvents.collect {
-            coroutineScope.launch {
-                snackbarHostState.currentSnackbarData?.dismiss()
-                val result = snackbarHostState.showSnackbar(
-                    it.message.asString(context),
-                    it.actionLabel?.asString(context),
-                    duration = it.duration ?: SnackbarDuration.Short)
-                when (result) {
-                    SnackbarResult.ActionPerformed -> it.onAction?.let { action -> action() }
-                    SnackbarResult.Dismissed -> {}
-                }
-            }
-        }
-    }
+    SnackbarEventsReceiver(
+        events = viewModel.snackbarEvents,
+        snackbarHostState = snackbarHostState)
 
     Scaffold(
         topBar = {

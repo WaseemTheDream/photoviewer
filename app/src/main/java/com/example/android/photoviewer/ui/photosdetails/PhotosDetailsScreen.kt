@@ -32,6 +32,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -43,6 +45,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -62,10 +65,14 @@ import coil.compose.rememberImagePainter
 import com.example.android.photoviewer.R
 import com.example.android.photoviewer.data.model.Photo
 import com.example.android.photoviewer.ui.common.ErrorMessage
+import com.example.android.photoviewer.ui.common.SnackbarEventsReceiver
 import com.example.android.photoviewer.ui.common.SystemBroadcastReceiver
 import com.example.android.photoviewer.ui.main.MainViewModel
 import com.example.android.photoviewer.ui.common.ThemeSwitcher
 import com.example.android.photoviewer.ui.model.PhotosDataSource
+import com.example.android.photoviewer.ui.model.SnackbarEvent
+import com.example.android.photoviewer.ui.model.UiText
+import kotlinx.coroutines.launch
 import net.engawapg.lib.zoomable.rememberZoomState
 import net.engawapg.lib.zoomable.zoomable
 
@@ -87,6 +94,12 @@ fun PhotosDetailsScreen(
     val photo: Photo? by viewModel.photo.collectAsState()
     val downloadId = remember { mutableLongStateOf(-1) }
     val openDownloadDialog = remember { mutableStateOf(false) }
+
+    val snackbarHostState = remember { SnackbarHostState() }
+    SnackbarEventsReceiver(
+        events = viewModel.snackbarEvents,
+        snackbarHostState = snackbarHostState)
+
     Scaffold(
         topBar = {
             Row(
@@ -116,23 +129,29 @@ fun PhotosDetailsScreen(
                 ThemeSwitcher(mainViewModel = mainViewModel)
                 MoreOptionsSelector(viewModel = viewModel, photo = photo, openDownloadDialog)
             }
-        }
+        },
+        snackbarHost = { SnackbarHost(snackbarHostState) }
     ) {
         PhotosDetailsScreenContent(photo, paddingValues = it)
     }
 
-    if (downloadId.value != (-1).toLong()) {
-        val context = LocalContext.current
+    if (downloadId.value != -1L) {
+        val coroutineScope = rememberCoroutineScope()
         SystemBroadcastReceiver(DownloadManager.ACTION_DOWNLOAD_COMPLETE) { intent ->
             val completedDownloadId = intent?.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1)
             if (completedDownloadId == downloadId.value) {
-                Toast.makeText(context, R.string.download_completed, Toast.LENGTH_SHORT).show()
+                coroutineScope.launch {
+                    viewModel.snackbarEventsChannel.send(
+                        SnackbarEvent(
+                            UiText.StringResource(R.string.download_completed)))
+                }
             }
         }
     }
 
     if (openDownloadDialog.value && photo != null) {
         DownloadConfirmationDialog(
+            viewModel = viewModel,
             photo = photo!!,
             openDownloadDialog = openDownloadDialog,
             downloadId = downloadId)
@@ -141,6 +160,7 @@ fun PhotosDetailsScreen(
 
 @Composable
 fun DownloadConfirmationDialog(
+    viewModel: PhotosDetailsViewModel,
     photo: Photo,
     openDownloadDialog: MutableState<Boolean>,
     downloadId: MutableLongState
@@ -150,6 +170,7 @@ fun DownloadConfirmationDialog(
         mutableStateOf(
             URLUtil.guessFileName(photo.source.original, null, null)) 
     }
+    val coroutineScope = rememberCoroutineScope()
     AlertDialog(
         onDismissRequest = {
             openDownloadDialog.value = false
@@ -169,7 +190,13 @@ fun DownloadConfirmationDialog(
             Button(
                 onClick = {
                     openDownloadDialog.value = false
-                    downloadFile(activity, photo, fileName.value, downloadId)
+                    downloadFile(activity, photo, fileName.value, downloadId) {
+                        coroutineScope.launch {
+                            viewModel.snackbarEventsChannel.send(
+                                SnackbarEvent(
+                                    UiText.StringResource(R.string.download_started)))
+                        }
+                    }
                 },
                 colors = ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.primary),
@@ -285,7 +312,8 @@ private fun downloadFile(
     activity: Activity,
     photo: Photo,
     fileName: String,
-    downloadId: MutableLongState
+    downloadId: MutableLongState,
+    notifyDownloadStarted: () -> Unit,
 ) {
     if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q &&
         ContextCompat.checkSelfPermission(
@@ -311,6 +339,6 @@ private fun downloadFile(
     val downloadManager = activity.getSystemService(DOWNLOAD_SERVICE) as DownloadManager
     val newDownloadId = downloadManager.enqueue(request)
 
-    Toast.makeText(activity, R.string.download_started, Toast.LENGTH_SHORT).show()
+    notifyDownloadStarted()
     downloadId.value = newDownloadId
 }
