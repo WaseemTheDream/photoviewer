@@ -38,10 +38,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.LoadState
@@ -88,10 +90,12 @@ fun PhotosListScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 val selectionStatus = viewModel.selectedPhotosStatus.collectAsState()
-                if (selectionStatus.value != PhotoSelectionStatus.NONE) {
-                    SelectionTopBar(viewModel)
-                } else {
-                    DefaultTopBar(mainViewModel, viewModel, openNavigationDrawer)
+                
+                when (selectionStatus.value) {
+                    PhotoSelectionStatus.NONE -> 
+                        DefaultTopBar(mainViewModel, viewModel, openNavigationDrawer)
+                    else ->
+                        SelectionTopBar(viewModel)
                 }
             }
         }
@@ -145,7 +149,7 @@ fun RowScope.SelectionTopBar(
     val selectionStatus = viewModel.selectedPhotosStatus.collectAsState()
     val actionIcon = when (selectionStatus.value) {
         PhotoSelectionStatus.ALL_SAVED -> Icons.Default.Delete
-        else -> Icons.Default.Add
+        else -> ImageVector.vectorResource(R.drawable.ic_save)
     }
     TitleBarButton(
         imageVector = actionIcon,

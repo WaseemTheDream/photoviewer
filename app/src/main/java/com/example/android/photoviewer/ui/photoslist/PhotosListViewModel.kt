@@ -5,7 +5,6 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
-import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.map
 import com.example.android.photoviewer.data.converter.toDomain
 import com.example.android.photoviewer.data.entity.SavedPhotoEntity
@@ -54,6 +53,7 @@ class PhotosListViewModel @Inject constructor(
     init {
         readDisplayStyle()
         observeSelectedPhotos()
+        pruneSelectedPhotos()
     }
 
     fun getRemotePhotos() {
@@ -102,12 +102,14 @@ class PhotosListViewModel @Inject constructor(
     fun saveSelectedPhotos() {
         viewModelScope.launch {
             localPhotosDataSource.savePhotos(selectedPhotos.value)
+            calculateSelectedPhotosStatus(selectedPhotos.value)
         }
     }
 
     fun unSaveSelectedPhotos() {
         viewModelScope.launch {
             localPhotosDataSource.unSavePhotos(selectedPhotos.value)
+            calculateSelectedPhotosStatus(selectedPhotos.value)
         }
     }
 
@@ -115,28 +117,43 @@ class PhotosListViewModel @Inject constructor(
         _selectedPhotos.value = listOf()
     }
 
+    private fun pruneSelectedPhotos() {
+        viewModelScope.launch {
+            photosState.collect { pagingData ->
+                val collectionIds = mutableSetOf<Int>()
+                pagingData.map { collectionIds.add(it.id) }
+                _selectedPhotos.value =
+                    _selectedPhotos.value.filter { collectionIds.contains(it.id) }
+            }
+        }
+    }
+
     private fun observeSelectedPhotos() {
         viewModelScope.launch {
             selectedPhotos.collect {
-                val savedPhotos = it.fold(0) { acc, photo ->
-                    when (localPhotosDataSource.isSaved(photo.id).first()) {
-                        false -> acc
-                        true -> acc + 1
-                    }
-                }
-                val selectionStatus = when (savedPhotos) {
-                    0 ->
-                        if (selectedPhotos.value.isEmpty()) {
-                            PhotoSelectionStatus.NONE
-                        } else {
-                            PhotoSelectionStatus.NONE_SAVED
-                        }
-                    it.size -> PhotoSelectionStatus.ALL_SAVED
-                    else -> PhotoSelectionStatus.SOME_SAVED
-                }
-                _selectedPhotosStatus.value = selectionStatus
+                calculateSelectedPhotosStatus(it)
             }
         }
+    }
+
+    private suspend fun calculateSelectedPhotosStatus(photos: List<Photo>) {
+        val savedPhotos = photos.fold(0) { acc, photo ->
+            when (localPhotosDataSource.isSaved(photo.id).first()) {
+                false -> acc
+                true -> acc + 1
+            }
+        }
+        val selectionStatus = when (savedPhotos) {
+            0 ->
+                if (selectedPhotos.value.isEmpty()) {
+                    PhotoSelectionStatus.NONE
+                } else {
+                    PhotoSelectionStatus.NONE_SAVED
+                }
+            photos.size -> PhotoSelectionStatus.ALL_SAVED
+            else -> PhotoSelectionStatus.SOME_SAVED
+        }
+        _selectedPhotosStatus.value = selectionStatus
     }
 
     private fun readDisplayStyle() {
