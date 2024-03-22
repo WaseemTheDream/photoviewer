@@ -4,13 +4,16 @@ import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
@@ -42,6 +45,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -66,6 +70,7 @@ import com.example.android.photoviewer.ui.main.MainViewModel
 import com.example.android.photoviewer.ui.model.DisplayStyle
 import com.example.android.photoviewer.ui.model.PhotoSelectionStatus
 import com.example.android.photoviewer.ui.model.PhotosDataSource
+import com.example.android.photoviewer.ui.theme.AppTheme
 
 
 @Composable
@@ -128,8 +133,10 @@ fun PhotosListScreen(
         }
 
         when (selectedStyle) {
-            DisplayStyle.Card -> PhotosCardListScreenContent(it, viewModel, clickListener)
-            DisplayStyle.Grid -> PhotosGridScreenContent(it, viewModel, clickListener)
+            DisplayStyle.Card ->
+                PhotosCardListScreenContent(it, viewModel, clickListener)
+            DisplayStyle.Grid ->
+                PhotosGridScreenContent(it, mainViewModel, viewModel, clickListener)
         }
     }
 }
@@ -225,6 +232,7 @@ private val span: (LazyGridItemSpanScope) -> GridItemSpan = { GridItemSpan(COLUM
 @Composable
 fun PhotosGridScreenContent(
     paddingValues: PaddingValues,
+    mainViewModel: MainViewModel,
     viewModel: PhotosListViewModel,
     photoClickListener: (Photo) -> Unit) {
     val photoPagingItems: LazyPagingItems<Photo> = viewModel.photosState.collectAsLazyPagingItems()
@@ -262,34 +270,51 @@ fun PhotosGridScreenContent(
                 val selectedItems by viewModel.selectedPhotos.collectAsState()
                 val isSelected = selectedItems.contains(it)
                 val isInSelectionMode = viewModel.selectedPhotos.value.isNotEmpty()
-                ItemPhotoCell(
-                    photo = it,
+
+                val theme = mainViewModel.appTheme.collectAsState()
+                val backgroundColor =
+                    if (!isSelected) {
+                        Color.Transparent
+                    } else if (theme.value == AppTheme.Dark) {
+                        Color.DarkGray
+                    } else {
+                        Color.LightGray
+                    }
+
+                Box(
                     modifier = Modifier
-                        .combinedClickable(
-                            onClick = {
-                                if (isInSelectionMode) {
-                                    if (isSelected) {
-                                        viewModel.unselectPhoto(it)
+                        .background(backgroundColor)
+                        .height(200.dp)) {
+                    ItemPhotoCell(
+                        photo = it,
+                        isSelected = isSelected,
+                        modifier = Modifier
+                            .combinedClickable(
+                                onClick = {
+                                    if (isInSelectionMode) {
+                                        if (isSelected) {
+                                            viewModel.unselectPhoto(it)
+                                        } else {
+                                            viewModel.selectPhoto(it)
+                                        }
+                                    } else {
+                                        photoClickListener(it)
+                                    }
+                                },
+                                onLongClick = {
+                                    if (isInSelectionMode) {
+                                        if (isSelected) {
+                                            viewModel.unselectPhoto(it)
+                                        } else {
+                                            viewModel.selectPhoto(it)
+                                        }
                                     } else {
                                         viewModel.selectPhoto(it)
                                     }
-                                } else {
-                                    photoClickListener(it)
                                 }
-                            },
-                            onLongClick = {
-                                if (isInSelectionMode) {
-                                    if (isSelected) {
-                                        viewModel.unselectPhoto(it)
-                                    } else {
-                                        viewModel.selectPhoto(it)
-                                    }
-                                } else {
-                                    viewModel.selectPhoto(it)
-                                }
-                            }
-                        )
-                        .padding(if (isSelected) 5.dp else (0.dp)))
+                            )
+                            .padding(if (isSelected) 10.dp else (0.dp)))
+                }
             }
         }
 
