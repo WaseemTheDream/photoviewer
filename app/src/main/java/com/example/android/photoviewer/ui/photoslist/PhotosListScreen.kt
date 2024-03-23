@@ -29,10 +29,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -40,7 +38,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -56,6 +53,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.itemKey
 import com.example.android.photoviewer.R
 import com.example.android.photoviewer.data.model.Photo
 import com.example.android.photoviewer.ui.common.TitleBarText
@@ -254,56 +252,59 @@ fun PhotosGridScreenContent(
         columns = GridCells.Fixed(COLUMN_COUNT),
         verticalArrangement = Arrangement.spacedBy(4.dp),
         horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-        items(photoPagingItems.itemCount) {index ->
-            photoPagingItems.get(index)?.let {
-                val selectedItems by viewModel.selectedPhotos.collectAsState()
-                val isSelected = selectedItems.contains(it)
-                val isInSelectionMode = viewModel.selectedPhotos.value.isNotEmpty()
+        items(photoPagingItems.itemCount, photoPagingItems.itemKey { it.id }) {index ->
+            val photo = photoPagingItems[index]!!
+            val selectedItems by viewModel.selectedPhotos.collectAsState()
+            val isSelected = selectedItems.contains(photo)
+            val isInSelectionMode = viewModel.selectedPhotos.value.isNotEmpty()
 
-                val theme = mainViewModel.appTheme.collectAsState()
-                val backgroundColor =
-                    if (!isSelected) {
-                        Color.Transparent
-                    } else if (theme.value == AppTheme.Dark) {
-                        Color.DarkGray
-                    } else {
-                        Color.LightGray
-                    }
-
-                Box(
-                    modifier = Modifier
-                        .background(backgroundColor)
-                        .height(200.dp)) {
-                    ItemPhotoCell(
-                        photo = it,
-                        isSelected = isSelected,
-                        modifier = Modifier
-                            .combinedClickable(
-                                onClick = {
-                                    if (isInSelectionMode) {
-                                        if (isSelected) {
-                                            viewModel.unselectPhoto(it)
-                                        } else {
-                                            viewModel.selectPhoto(it)
-                                        }
-                                    } else {
-                                        photoClickListener(it)
-                                    }
-                                },
-                                onLongClick = {
-                                    if (isInSelectionMode) {
-                                        if (isSelected) {
-                                            viewModel.unselectPhoto(it)
-                                        } else {
-                                            viewModel.selectPhoto(it)
-                                        }
-                                    } else {
-                                        viewModel.selectPhoto(it)
-                                    }
-                                }
-                            )
-                            .padding(if (isSelected) 10.dp else (0.dp)))
+            val theme = mainViewModel.appTheme.collectAsState()
+            val backgroundColor =
+                if (!isSelected) {
+                    Color.Transparent
+                } else if (theme.value == AppTheme.Dark) {
+                    Color.DarkGray
+                } else {
+                    Color.LightGray
                 }
+
+            Box(
+                modifier = Modifier
+                    .background(backgroundColor)
+                    .animateItemPlacement()
+                    .height(200.dp)) {
+                ItemPhotoCell(
+                    photo = photo,
+                    isSelected = isSelected,
+                    modifier = Modifier
+                        .combinedClickable(
+                            onClick = {
+                                if (isInSelectionMode) {
+                                    if (isSelected) {
+                                        viewModel.unselectPhoto(photo)
+                                    } else {
+                                        viewModel.selectPhoto(photo)
+                                    }
+                                } else {
+                                    photoClickListener(photo)
+                                }
+                            },
+                            onLongClick = {
+                                if (isInSelectionMode) {
+                                    if (isSelected) {
+                                        viewModel.unselectPhoto(photo)
+                                    } else {
+                                        viewModel.selectPhoto(photo)
+                                    }
+                                } else {
+                                    viewModel.selectPhoto(photo)
+                                }
+                            }
+                        )
+                        .padding(if (isSelected) 10.dp else (0.dp)))
+            }
+            photoPagingItems[index]!!.let {
+
             }
         }
 

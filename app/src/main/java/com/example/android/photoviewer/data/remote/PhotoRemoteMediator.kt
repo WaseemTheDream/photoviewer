@@ -91,7 +91,9 @@ class PhotoRemoteMediator @Inject constructor(
             }
 
             val photoEntities = photosResponse.photos
-                .mapIndexed { index, photo -> photo.toEntity(index) }
+                .mapIndexed { index, photo ->
+                    photo.lastUpdatedLocal = System.currentTimeMillis()
+                    photo.toEntity(index) }
 
             val keys = photosResponse.photos.map { photo ->
                 PhotoRemoteKey(

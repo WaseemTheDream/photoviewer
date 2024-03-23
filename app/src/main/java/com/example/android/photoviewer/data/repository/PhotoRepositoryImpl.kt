@@ -24,7 +24,10 @@ class PhotoRepositoryImpl @Inject constructor(
     @OptIn(ExperimentalPagingApi::class)
     override suspend fun getPhotos(): Flow<PagingData<Photo>> {
         return Pager(
-            config = PagingConfig(pageSize = Constants.MAX_PAGE_SIZE, prefetchDistance = 2),
+            config = PagingConfig(
+                pageSize = Constants.MAX_PAGE_SIZE,
+                prefetchDistance = 2,
+                enablePlaceholders = false),
             remoteMediator = photoRemoteMediator,
             pagingSourceFactory = {
                 photoDb.photoDao().getAllPhotosPagingSource()
