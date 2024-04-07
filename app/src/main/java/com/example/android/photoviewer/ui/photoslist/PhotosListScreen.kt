@@ -38,6 +38,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -68,7 +69,11 @@ import com.example.android.photoviewer.ui.main.MainViewModel
 import com.example.android.photoviewer.ui.model.DisplayStyle
 import com.example.android.photoviewer.ui.model.PhotoSelectionStatus
 import com.example.android.photoviewer.ui.model.PhotosDataSource
+import com.example.android.photoviewer.ui.model.SnackbarEvent
+import com.example.android.photoviewer.ui.model.UiText
 import com.example.android.photoviewer.ui.theme.AppTheme
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 
 
 @Composable
@@ -222,6 +227,7 @@ fun PhotosGridScreenContent(
     mainViewModel: MainViewModel,
     viewModel: PhotosListViewModel,
     photoClickListener: (Photo) -> Unit) {
+    val coroutineScope = rememberCoroutineScope()
     val photoPagingItems: LazyPagingItems<Photo> = viewModel.photosState.collectAsLazyPagingItems()
 
     if (photoPagingItems.loadState.refresh is LoadState.Loading) {
@@ -234,7 +240,11 @@ fun PhotosGridScreenContent(
             error.error.localizedMessage ?:
             stringResource(id = R.string.unknown_error)
         if (photoPagingItems.itemCount > 0) {
-            Toast.makeText(LocalContext.current, errorMessage, Toast.LENGTH_LONG).show()
+            coroutineScope.launch {
+                viewModel.snackbarEventsChannel.send(
+                    SnackbarEvent(UiText.DynamicString(errorMessage),)
+                )
+            }
         } else {
             ErrorMessage(
                 modifier = Modifier
@@ -337,6 +347,7 @@ fun PhotosCardListScreenContent(
     viewModel: PhotosListViewModel,
     photoClickListener: (Photo) -> Unit) {
     val photoPagingItems: LazyPagingItems<Photo> = viewModel.photosState.collectAsLazyPagingItems()
+    val coroutineScope = rememberCoroutineScope()
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -345,9 +356,7 @@ fun PhotosCardListScreenContent(
         verticalArrangement = Arrangement.spacedBy(20.dp)) {
         item { Spacer(modifier = Modifier.padding(2.dp)) }
         items(photoPagingItems.itemCount) { index ->
-            photoPagingItems.get(index)?.let {
-                ItemPhotoCard(index = index, photo = it, photoClickListener)
-            }
+            ItemPhotoCard(index = index, photo = photoPagingItems[index]!!, photoClickListener)
         }
         photoPagingItems.apply {
             when {
@@ -363,7 +372,13 @@ fun PhotosCardListScreenContent(
                             stringResource(id = R.string.unknown_error)
 
                         if (photoPagingItems.itemCount > 0) {
-                            Toast.makeText(LocalContext.current, errorMessage, Toast.LENGTH_LONG).show()
+                            coroutineScope.launch {
+                                viewModel.snackbarEventsChannel.send(
+                                    SnackbarEvent(
+                                        UiText.DynamicString(errorMessage)
+                                    )
+                                )
+                            }
                         } else {
                             ErrorMessage(
                                 modifier = Modifier

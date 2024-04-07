@@ -57,7 +57,7 @@ class PhotosListViewModel @Inject constructor(
     private val _selectedPhotos: MutableStateFlow<List<Photo>> = MutableStateFlow(emptyList())
     val selectedPhotos: StateFlow<List<Photo>> = _selectedPhotos
 
-    private val snackbarEventsChannel = Channel<SnackbarEvent>()
+    val snackbarEventsChannel = Channel<SnackbarEvent>()
     val snackbarEvents: Flow<SnackbarEvent> = snackbarEventsChannel.receiveAsFlow()
 
     init {
